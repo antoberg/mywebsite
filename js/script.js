@@ -2,7 +2,7 @@
 
 /* ============================== typing animation ============================ */
 var typed = new Typed(".typing",{
-    strings:["Climber","","Rouleur","","Polyvalent rider","","Offensive rider",""],
+    strings:["Climber","","Rouleur","","Polyvalent rider",""],
     typeSpeed:100,
     BackSpeed:60,
     loop:true
