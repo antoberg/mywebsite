@@ -33,10 +33,19 @@ body
 {
     box-sizing: border-box;
 }
-ul
+.ul 
 {
-    list-style: none;
+    list-style-type: disc; /* Active les puces pour les listes */
+    padding-left: 20px; /* Ajoute un espace pour les indentations */
 }
+  
+.ul ul 
+{
+    list-style-type: circle; /* Style différent pour les sous-listes (puces cercles) */
+    padding-left: 40px; /* Ajoute de l'indentation à la sous-liste */
+
+}
+  
 .section
 {
     background: var(--bg-black-900);
@@ -128,6 +137,23 @@ ul
     top: 100%;
     left: 0;
     margin-top: 8px;
+}
+.section-subtitle
+{
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 60px;
+    text-align: center;
+
+}
+.section-subtitle h2
+{
+    font-size: 30px;
+    color: var(--text-black-900);
+    font-weight: 700;
+    position: relative;
+    text-decoration: underline;
+
 }
 .row
 {
@@ -593,9 +619,20 @@ h3.my-profession
     font-size: 16px;
     text-align: justify;
     color: var(--text-black-700);
-    list-style-type: circle;
     margin-left: 20px;
+    
+    
+
 }
+
+.results .about-content .timeline ul.timeline-text ul
+{
+    
+    margin-left: 20px;
+    
+
+}
+
 .results .service-item
 {
     margin-bottom: 30px;
@@ -659,6 +696,7 @@ h3.my-profession
 {
     flex: 0 0 100%;
     max-width: 100%;
+    margin-bottom: 50px;
 }
 .data .timeline
 {
@@ -668,6 +706,7 @@ h3.my-profession
     border-radius: 10px;
     width: 100%;
     position: relative;
+    
 }
 
 /* Medias */
