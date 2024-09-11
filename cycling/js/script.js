@@ -112,6 +112,15 @@ const nav = document.querySelector(".nav"),
           removeBackSection();
           addBackSection(sectionIndex);
       })
+      document.querySelector(".get-home").addEventListener("click", function()
+      {
+          const sectionIndex = this.getAttribute("data-section-index");
+          //console.log(sectionIndex);
+          showSection(this);
+          updateNav(this);
+          removeBackSection();
+          addBackSection(sectionIndex);
+      })
       const navTogglerBtn = document.querySelector(".nav-toggler"),
             aside = document.querySelector(".aside");
             navTogglerBtn.addEventListener("click", () => 

@@ -203,7 +203,7 @@ body
     transition: all 0.3s ease;
     
 }
-.aside .logo
+.aside .get-home
 {
     position: absolute;
     top: 50px;
@@ -453,14 +453,7 @@ h3.hello img
     font-weight: 700;
     color: var(--text-black-900);
 }
-.about .about-content .about-text img
-{
-    
-    height: 30px;
-    margin-left: 10px;
-    vertical-align: middle;
-   
-}
+
 .about .about-content .about-text h3 span
 {
     color: var(--skin-color);
@@ -827,10 +820,9 @@ h3.hello img
 .contact .contact-info-item
 {
     flex: 0 0 25%;
-    max-width: 25%;
+    max-width: 33%;
     text-align: center;
-    margin-bottom: 60px;
-    margin: 60px auto
+    margin: 30px; 
 }
 .contact .contact-info-item .icon
 {
