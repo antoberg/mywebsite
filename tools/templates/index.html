@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tools</title>
+    </head>
+    <body>
+
+        
+        <form action ="/rechercher" method="POST">
+            <label for="search">Startlist URL</label>
+            <input type="text" id="search" name="search" placeholder="https://www.directvelo.com/epreuve/..."></input>
+            <button type="submit">GET STARTLIST</button>
+        </form>
+        <i>exemple url : https://www.directvelo.com/actualite/115632/jard-les-herbiers-les-engages</i>
+
+        {% if resultats %}
+            <h2>Engagés :</h2>
+            <p>{{ resultats|safe }}</p>
+        {% endif %}
+
+    </body>
+</html>
