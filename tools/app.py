@@ -45,7 +45,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('startlist.html')
 
 #Fonction pour traiter la recherche (script Python à exécuter)
 @app.route('/rechercher', methods=['POST'])
@@ -54,7 +54,7 @@ def rechercher():
     print(query)
     if not query or query.strip() == "":
         result = "Veuillez entrer une URL valide", 400
-        return render_template('index.html', resultats = result)
+        return render_template('startlist.html', resultats = result)
 
     try:
         # Effectuer une action avec la valeur recherchée
@@ -66,12 +66,12 @@ def rechercher():
         
 
         print(result)
-        return render_template('index.html', resultats = result)
+        return render_template('startlist.html', resultats = result)
 
         #return result
     except Exception as e:
         result= f"Erreur lors de la requête : {e}", 500
-        return render_template('index.html', resultats = result)
+        return render_template('startlist.html', resultats = result)
 
     
 if __name__ == '__main__':

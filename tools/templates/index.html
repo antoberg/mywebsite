@@ -6,19 +6,13 @@
         <title>Tools</title>
     </head>
     <body>
+        <menu>
+            <li><button id="route">Analyse a GPX</button></li>
+            <li><button id="startlist">Analyse a startlist</button></li>
+            <li><button id="pressure">Calculate tire pressure</button></li>
+            <li><button id="startlist">Analyse a startlist</button></li>
+          </menu>
 
         
-        <form action ="/rechercher" method="POST">
-            <label for="search">Startlist URL</label>
-            <input type="text" id="search" name="search" placeholder="https://www.directvelo.com/epreuve/..."></input>
-            <button type="submit">GET STARTLIST</button>
-        </form>
-        <i>exemple url : https://www.directvelo.com/actualite/115632/jard-les-herbiers-les-engages</i>
-
-        {% if resultats %}
-            <h2>Engagés :</h2>
-            <p>{{ resultats|safe }}</p>
-        {% endif %}
-
     </body>
 </html>
