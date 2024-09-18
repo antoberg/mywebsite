@@ -47,34 +47,34 @@ app = Flask(__name__)
 def index():
     return render_template('startlist.html')
 
-#Fonction pour traiter la recherche (script Python à exécuter)
-@app.route('/rechercher', methods=['POST'])
-def rechercher():
-    query = request.form['search']  # Récupère la requête de recherche
-    print(query)
-    if not query or query.strip() == "":
-        result = "Veuillez entrer une URL valide", 400
-        return render_template('startlist.html', resultats = result)
+# #Fonction pour traiter la recherche (script Python à exécuter)
+# @app.route('/rechercher', methods=['POST'])
+# def rechercher():
+#     query = request.form['search']  # Récupère la requête de recherche
+#     print(query)
+#     if not query or query.strip() == "":
+#         result = "Veuillez entrer une URL valide", 400
+#         return render_template('startlist.html', resultats = result)
 
-    try:
-        # Effectuer une action avec la valeur recherchée
-        # startlist, id, name = get_startlist(query)
+#     try:
+#         # Effectuer une action avec la valeur recherchée
+#         # startlist, id, name = get_startlist(query)
         
 
         
-        # result = '<br>'.join('-'+startlist['name'])
-        # result = name +' ('+str(len(startlist['name']))+'):<br><br>' + result
+#         # result = '<br>'.join('-'+startlist['name'])
+#         # result = name +' ('+str(len(startlist['name']))+'):<br><br>' + result
 
         
-        result = query
+#         result = query
 
-        print(result)
-        return render_template('startlist.html', resultats = result)
+#         print(result)
+#         return render_template('startlist.html', resultats = result)
 
-        #return result
-    except Exception as e:
-        result= f"Erreur lors de la requête : {e}", 500
-        return render_template('startlist.html', resultats = result)
+#         #return result
+#     except Exception as e:
+#         result= f"Erreur lors de la requête : {e}", 500
+#         return render_template('startlist.html', resultats = result)
 
 
 # a delete en production car lancé via wsgi.py
