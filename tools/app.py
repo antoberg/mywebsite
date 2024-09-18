@@ -76,8 +76,9 @@ def rechercher():
         result= f"Erreur lors de la requête : {e}", 500
         return render_template('startlist.html', resultats = result)
 
-    
-if __name__ == '__main__':
-    app.run(debug=True)
+
+# a delete en production car lancé via wsgi.py
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
 
