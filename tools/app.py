@@ -58,12 +58,15 @@ def rechercher():
 
     try:
         # Effectuer une action avec la valeur recherchée
-        startlist, id, name = get_startlist(query)
+        # startlist, id, name = get_startlist(query)
+        
 
         
-        result = '<br>'.join('-'+startlist['name'])
-        result = name +' ('+str(len(startlist['name']))+'):<br><br>' + result
+        # result = '<br>'.join('-'+startlist['name'])
+        # result = name +' ('+str(len(startlist['name']))+'):<br><br>' + result
+
         
+        result = query
 
         print(result)
         return render_template('startlist.html', resultats = result)
