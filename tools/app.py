@@ -43,7 +43,7 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/tools/startlist')
 def index():
     return render_template('startlist.html')
 
