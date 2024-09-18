@@ -48,7 +48,7 @@ def index():
     return render_template('startlist.html')
 
 #Fonction pour traiter la recherche (script Python à exécuter)
-@app.route('/rechercher', methods=['POST'])
+@app.route('/tools/startlist', methods=['POST'])
 def rechercher():
     query = request.form['search']  # Récupère la requête de recherche
     print(query)
