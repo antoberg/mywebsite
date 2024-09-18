@@ -43,12 +43,12 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-@app.route('/tools/startlist')
+@app.route('/')
 def index():
     return render_template('startlist.html')
 
 #Fonction pour traiter la recherche (script Python à exécuter)
-@app.route('/tools/startlist', methods=['POST'])
+@app.route('/rechercher', methods=['POST'])
 def rechercher():
     query = request.form['search']  # Récupère la requête de recherche
     print(query)
