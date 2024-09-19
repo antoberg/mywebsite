@@ -42,9 +42,11 @@ from flask import Flask, render_template
 #%%
 
 app = Flask(__name__)
+app.logger.info('app was launched')
 
-@app.route('/startlist')
+@app.route('/myapp/')
 def index():
+    app.logger.info('Startlist route was accessed')
     return render_template('startlist.html')
 
 # #Fonction pour traiter la recherche (script Python à exécuter)
