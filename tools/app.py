@@ -44,7 +44,7 @@ from flask import Flask, render_template
 app = Flask(__name__)
 app.logger.info('app was launched')
 
-@app.route('/myapp/')
+@app.route('/tools/startlist')
 def index():
     app.logger.info('Startlist route was accessed')
     return render_template('startlist.html')
