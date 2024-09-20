@@ -82,7 +82,7 @@ def rechercher():
 
 
 # a delete en production car lancé via wsgi.py
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
 
