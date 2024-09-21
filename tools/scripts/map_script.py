@@ -68,11 +68,11 @@ def make_map(coords):
     # ant_path.add_to(m)
 
     #ajout du vent
-    wind_vectors,wind_bearing = get_wind(lats,lons)
-    for index,vector in enumerate(wind_vectors):
+    # wind_vectors,wind_bearing = get_wind(lats,lons)
+    # for index,vector in enumerate(wind_vectors):
         
-        folium.PolyLine(vector,color='black').add_to(m)
-        folium.RegularPolygonMarker(vector[1],fill_opacity=100,opacity=100,fill_color='black',color='black',number_of_sides=3,radius=10,rotation=wind_bearing[index],popup='-60').add_to(m)
+    #     folium.PolyLine(vector,color='black').add_to(m)
+    #     folium.RegularPolygonMarker(vector[1],fill_opacity=100,opacity=100,fill_color='black',color='black',number_of_sides=3,radius=10,rotation=wind_bearing[index],popup='-60').add_to(m)
 
     folium.PolyLine(coords,color='red',).add_to(m)
 
