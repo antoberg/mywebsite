@@ -1,48 +1,9 @@
 from flask import Flask, render_template, request
-
-
-
-#%%
-import requests
-from bs4 import BeautifulSoup as bs
-import pandas as pd
-import re
-
-def get_startlist(url):
-    response = requests.get(url)
-    soup = bs(response.content, "lxml") #données html brutes
-    
-    body = soup.find("section",{"class" : "startlist"})
-    riders = body.find_all("li",{"class": "startlist-rider"})
-    race_ID = soup.find('body', id='article-show')['data-article']
-    race_name = soup.find('div', {"class" : 'main'}).h1.text
-    
-    
-    r_urls=[]
-    r_name=[]
-    r_number=[]
-    for r in riders:
-        r_urls.append(r.a['href'])
-        row_name = r.a.text
-        row_name = row_name.replace('\n', '')
-        row_name = re.sub(r"([A-Z])", r" \1", row_name).strip()
-        r_name.append(row_name)
-         #dossard
-        r_number.append(r.find("em", {"class" : "startlist-number"}).text)
-        
-    df_startlist=pd.DataFrame({
-        'name': r_name,
-        'url' : r_urls,
-        'number' : r_number
-        })
-    
-    print('Partants scrapés avec succès pour : '+race_name)
-    return  df_startlist, race_ID, race_name
-
-#%%
+import scripts.startlist_script as ss
+import scripts.map_script as ms
 
 app = Flask(__name__)
-app.logger.info('app was launched')
+
 
 @app.route('/tools/startlist/')
 def index():
@@ -62,7 +23,7 @@ def rechercher():
 
     try:
         # Effectuer une action avec la valeur recherchée
-        startlist, id, name = get_startlist(query)
+        startlist, id, name = ss.get_startlist(query)
         
 
         
@@ -80,9 +41,52 @@ def rechercher():
         result= f"Erreur lors de la requête : {e}", 500
         return render_template('startlist.html', resultats = result)
 
+import os
+FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
+@app.route('/tools/map/')
+def index_map():
+    # Récupérer la liste des fichiers dans le dossier
+    file_list = os.listdir(FILE_DIRECTORY)
+    return render_template('map_settings.html', files=file_list)
+    
+
+@app.route('/upload_gpx', methods=['POST'])
+def upload_gpx():
+    render_template('map_settings.html')
+    if 'gpxFile' not in request.files:
+        return "Pas de fichier sélectionné"
+    
+    file = request.files['gpxFile']
+
+    if file.filename == '':
+        return "Fichier non valide"
+
+    if file and file.filename.endswith('.gpx'):
+        filepath = os.path.join('tools\gpx_files', file.filename)
+        file.save(filepath)
+        
+        print(filepath)
+        return open_map(filepath)
+       
+    
+    return "Format de fichier non supporté"
+
+@app.route('/load_gpx/<filename>')
+def load_gpx(filename):
+    filepath = os.path.join('tools\gpx_files', filename)
+    print(filepath)
+    return open_map(filepath)
+
+def open_map(filepath):
+    
+    coords = ms.read_gpx(filepath)
+    ms.make_map(coords)
+    return render_template('map.html')
+
+
 
 # a delete en production car lancé via wsgi.py
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
 
 

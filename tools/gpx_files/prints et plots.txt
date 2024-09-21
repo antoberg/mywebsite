@@ -1,0 +1,23 @@
+    #PRINT & PLOT
+    
+t = "28 10 2019 13:00:00"
+precision=15
+v_moy=30
+
+fichier_gpx = open('jeudi plaisir.gpx', 'r')
+
+lat,lon,ele,points,nb_points,denivele=file_analysis(fichier_gpx)
+kms,duree=stats(lat,lon,v_moy)
+
+print(nb_points,' points de coordonnées trouvés')
+print(kms,' km à parcourir, soit ',duree,' heures de vélo',denivele,' m de denivele')
+
+plt.plot(np.linspace(0,int(kms),np.size(ele)),ele,'r')
+
+    #METEO
+latitude,longitude,wind_speed,wind_dir=meteo(lat,lon,points,nb_points,v_moy,t,precision) #USES API
+
+
+
+    #FOLIUM
+map_folium(lat,lon,latitude,longitude,nb_points,points,kms,wind_speed,wind_dir,precision)
