@@ -11,7 +11,7 @@ FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_f
 def route_map():
     # Récupérer la liste des fichiers dans le dossier
     file_list = os.listdir(FILE_DIRECTORY)
-    return render_template('map_settings.html', files=file_list)
+    return render_template('map.html', files=file_list)
     
 
 
@@ -85,7 +85,7 @@ def open_map(filepath):
     
     coords = ms.read_gpx(filepath)
     ms.make_map(coords)
-    return render_template('map.html')
+    return render_template('gpx_viewer.html')
 
 
 

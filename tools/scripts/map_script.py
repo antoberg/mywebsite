@@ -75,7 +75,7 @@ def make_map(coords):
 
     folium.PolyLine(coords,color='red',).add_to(m)
     
-    m.save('tools/templates/map.html')
+    m.save('tools/templates/gpx_viewer.html')
 
 
 
