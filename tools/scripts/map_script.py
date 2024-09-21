@@ -2,6 +2,7 @@ import gpxpy
 import folium
 from folium.plugins import AntPath
 import numpy as np
+import os
 
 def read_gpx(fichier_gpx):
     with open(fichier_gpx, 'r') as f:
@@ -74,8 +75,13 @@ def make_map(coords):
         folium.RegularPolygonMarker(vector[1],fill_opacity=100,opacity=100,fill_color='black',color='black',number_of_sides=3,radius=10,rotation=wind_bearing[index],popup='-60').add_to(m)
 
     folium.PolyLine(coords,color='red',).add_to(m)
-    
-    m.save('tools/templates/gpx_viewer.html')
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Construire le chemin vers le fichier dans 'tools/templates'
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    template_file_path = os.path.join(current_dir, '../templates/gpx_viewer.html')
+    m.save(template_file_path)
 
 
 

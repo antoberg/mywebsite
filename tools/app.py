@@ -71,7 +71,8 @@ def upload_gpx():
         return "Fichier non valide"
 
     if file and file.filename.endswith('.gpx'):
-        filepath = os.path.join('tools\gpx_files', file.filename)
+        files_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
+        filepath = os.path.join(files_dir, file.filename)
         file.save(filepath)
         
         print(filepath)
