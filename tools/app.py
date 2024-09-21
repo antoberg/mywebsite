@@ -10,6 +10,15 @@ def index():
     app.logger.info('Startlist route was accessed')
     return render_template('startlist.html')
 
+import os
+FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
+@app.route('/tools/map/')
+def index_map():
+    # Récupérer la liste des fichiers dans le dossier
+    file_list = os.listdir(FILE_DIRECTORY)
+    return render_template('map_settings.html')#, files=file_list
+    
+
 
 
 #Fonction pour traiter la recherche (script Python à exécuter)
@@ -41,14 +50,7 @@ def rechercher():
         result= f"Erreur lors de la requête : {e}", 500
         return render_template('startlist.html', resultats = result)
 
-import os
-FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
-@app.route('/tools/map/')
-def index_map():
-    # Récupérer la liste des fichiers dans le dossier
-    file_list = os.listdir(FILE_DIRECTORY)
-    return render_template('map_settings.html', files=file_list)
-    
+
 
 @app.route('/upload_gpx', methods=['POST'])
 def upload_gpx():
