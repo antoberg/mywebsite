@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request
 import scripts.startlist_script as ss
 import scripts.map_script as ms
+import os
 
 app = Flask(__name__)
 
-import os
 FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
 
 @app.route('/tools/map/')
@@ -61,7 +61,7 @@ def rechercher():
 
 @app.route('/upload_gpx', methods=['POST'])
 def upload_gpx():
-    render_template('map_settings.html')
+    render_template('map.html')
     if 'gpxFile' not in request.files:
         return "Pas de fichier sélectionné"
     
@@ -82,7 +82,9 @@ def upload_gpx():
 
 @app.route('/load_gpx/<filename>')
 def load_gpx(filename):
-    filepath = os.path.join('tools\gpx_files', filename)
+    #chemin absolu du dossier
+    files_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
+    filepath = os.path.join(files_dir, filename)
     print(filepath)
     return open_map(filepath)
 
