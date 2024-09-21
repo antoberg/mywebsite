@@ -9,10 +9,15 @@ FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_f
 
 @app.route('/tools/map/')
 def route_map():
-    # Récupérer la liste des fichiers dans le dossier
-    file_list = os.listdir(FILE_DIRECTORY)
-    return render_template('map.html', files=file_list)
-    
+    try:
+        # Récupérer la liste des fichiers dans le dossier
+        file_list = os.listdir(FILE_DIRECTORY)
+        app.logger.info(f"Fichiers trouvés: {file_list}")
+        return render_template('map.html', files=file_list)
+    except Exception as e:
+            app.logger.error(f"Erreur lors de l'accès au dossier: {e}")
+            return "Erreur lors de l'accès aux fichiers.", 500
+        
 
 
 @app.route('/tools/startlist/')
