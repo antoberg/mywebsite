@@ -10,33 +10,45 @@
 
         
         <h1>Paramètres</h1>
-        <h2>Choisir un fichier GPX</h2>
-        <h3>Importer un nouveau fichier</h3>
-        <form action="/upload_gpx" method="POST" enctype="multipart/form-data">
+        <h3>Veuillez entrer les paramètres de votre parcours</h3>
+        <!-- <form action="/upload_gpx" method="POST" enctype="multipart/form-data">
             <label for="gpxFile">Sélectionnez un fichier GPX :</label>
             <input type="file" id="gpxFile" name="gpxFile" accept=".gpx">
             <button type="submit">Charger</button>
-        </form>
-        <h3>Choisir un fichier existant</h3>
+        </form> -->
+        <!-- <h3>Choisir un fichier existant</h3>
         <ul>
             {% for file in files %}
                 <a href="/load_gpx/{{ file }}">{{ file }}</a>
                 <br>
             {% endfor %}
-        </ul>
-
-        <h2>Sélectionnez une date </h2>
-        <h4>(NE FONCTIONNE PAS ENCORE)</h4>
-        <i>Optionnel, si pas de date sélectionné la météo ne s'affichera pas</i>
-        <form action="/submit-datetime" method="post">
+        </ul> -->
+        
+        
+        <form action="/submit" method="POST" enctype="multipart/form-data">
             <label for="date">Choisissez une date :</label>
-            <input type="date" id="date" name="date">
+            <input type="date" id="date" name="date" value = '{{ default_date }}' >
             <br><br>
             <label for="time">Choisissez une heure :</label>
-            <input type="time" id="time" name="time">
+            <input type="time" id="time" name="time" value = '{{ default_time }}'>
             <br><br>
-            <input type="submit" value="Envoyer">
+            <label for="gpxFile">Sélectionnez un fichier GPX :</label>
+            <input type="file" id="gpxFile" name="gpxFile" accept=".gpx">
+            <br><br>
+            <label for="speed">Sélectionnez la vitesse moyenne prévue :</label>
+            <input type="number" id="speed" name="speed" min="10" max="60" value="30" step = "5">
+            <br><br>
+            <button type="submit">Charger</button>
+            
+
+            <!-- <input type="submit" value="Envoyer"> -->
         </form>
+        
+
+        <!-- <a>{{ error_message }}</a> -->
+                
+            
+        
 
 
     </body>

@@ -1,40 +1,78 @@
-#PARAMETRES : t = "21 Nov 2019 13:00:00" et precision = nb de pts meteo souhaites
-def meteo(lat,lon,points,nb_points,v_moy,time_sec,precision):
+import json
+import requests
+from datetime import datetime
+
+#%% sous-fonctions
+def get_date_timestamp(timestr):
+    #timestr exemple : "1999/08/06 12:00:00"
+    date_object = datetime.strptime(timestr,"%Y-%m-%d %H:%M:%S")
+    timestamp = date_object.timestamp()
+    return int(timestamp)
+
+def get_current_timestamp():
+    return (int(datetime.now().timestamp()))
+
+def get_exclusion_list(timestamp):
+    exclusion_list = ["current", "minutely","hourly","daily","alerts"]
+    # trouve la précision la plus adaptée parmis : minutely, hourly, daily en fonction de la date en entrée
+    # génère la liste d'exclusion pour la requête
+    if timestamp - get_current_timestamp() <= 0:
+        accuracy_str = "ERROR : ride date in the past"
+    elif timestamp - get_current_timestamp() <= 3600:
+        accuracy_str = "minutely"
+    elif timestamp - get_current_timestamp() <= 48*3600:
+        accuracy_str = "hourly"
+    elif timestamp - get_current_timestamp() <= 8*24*3600:
+        accuracy_str = "daily"
+    else:
+        accuracy_str = "ERROR : ride date too far from now"
+    print("accuracy : ", accuracy_str)
+    exclusion_list.remove(accuracy_str)
+
+    return accuracy_str, exclusion_list
+
+def request_data(lat,lon,exclusion_list):
     
+    base_url='https://api.openweathermap.org/data/3.0/onecall?lat={}&lon={}&exclude={}&appid=5f49b8cafb71989d6b08e823ca0c9b2c'
+    exclusion_str = ', '.join(exclusion_list)
+    url=base_url.format(lat,lon,exclusion_str)
+    response=requests.get(url)
+    json_data = json.loads(response.text)
+    return json_data
+
+def get_closest_forecast(timestamp, json_data, accuracy_str):
+    timedelta_list = [abs(timestamp-i['dt']) for i in json_data[accuracy_str]]
+    timedelta_min_index = timedelta_list.index(min(timedelta_list))
+    return timedelta_min_index
+
+#%% fonction globale
+def get_forecast(lat, lon, timestamp):
+    # date → timestamp 
+        # → exclusion_list (&coordonnées GPS) → requête openweather API : json_data (&timestamp) 
+            # → données les plus proches de la requete temporelle 
+
     
-    #calcul du pas entre 2 infos météos (en nb de points)
-    pas=int(nb_points/precision)
-    #calcul des coordonnées des pts météo
-    latitude=np.zeros(precision)
-    longitude=np.zeros(precision)
-    for i in range(0,precision):
-        latitude[i]=lat[pas*i]
-        longitude[i]=lon[pas*i]
-        
-    #Extraction des données et API et affectation aux variables
-    wind_speed=np.zeros(precision)
-    wind_dir=np.zeros(precision)
-    heures=np.zeros(precision)
-    temp=np.zeros(precision)
-    temp_apparent=np.zeros(precision)
-    precip=np.zeros(precision)
-    precip_proba=np.zeros(precision)
-    for i in range(0,precision):
-        dt=calc_distance(latitude[i-1],latitude[i],longitude[i-1],longitude[i])/v_moy
-        time_sec+=dt*3600
-        
-        base_url='https://api.darksky.net/forecast/f3bc3bd870812cc013666f2bfb75b45d/{},{},{}'
-        url=base_url.format(latitude[i],longitude[i],int(time_sec))
-        response=requests.get(url)
-        json_data = json.loads(response.text)  
-        
-        wind_speed[i]=np.around(json_data["currently"]["windSpeed"]*3.6,2)
-        wind_dir[i]=json_data["currently"]["windBearing"]
-        temp[i]=(np.around(json_data["currently"]["temperature"],1)-32)*(5/9)
-        temp_apparent[i]=(np.around(json_data["currently"]["apparentTemperature"],1)-32)*(5/9)
-        precip[i]=json_data["currently"]["precipIntensity"]
-        precip_proba[i]=json_data["currently"]["precipProbability"]
-        heures[i]=time_sec
-        
-        print('Point',i+1,':','vitesse =',wind_speed[i],'km/h, direction =',wind_dir[i],'deg')
-    return latitude,longitude,wind_speed,wind_dir,heures,precip,precip_proba,temp,temp_apparent
+    #obtenir la précision souhaitée dans la requete (hourly, daily, etc)
+    accuracy_str, exclusion_list = get_exclusion_list(timestamp)
+    # envoyer la requete et récupérer les donnes
+    json_data = request_data(lat,lon, exclusion_list)
+    forecast_index = get_closest_forecast(timestamp,json_data, accuracy_str)
+    forecast = json_data[accuracy_str][forecast_index]
+
+    # print("Heure :",
+    #       "\n   Heure de la prévision : ",forecast['dt'],
+    #       '\n   Heure souhaitée : ',timestamp,
+    #       '\n   Décalage : ',round((forecast['dt']- timestamp)/60,1),'minutes (>0 => heure forecast plus tard que heure souhaitée)')
+    
+    # print('Prévision : ')
+    # print("     Descritpion :",forecast['weather'][0]['description'])
+    # print("Vent :",
+    #       '\n   vitesse : ',forecast['wind_speed'],
+    #       '\n   direction :',forecast['wind_deg'])
+
+    return round(forecast['wind_speed'],1), int(forecast['wind_deg'])
+
+
+
+#%% debug
+# print(get_forecast(lat = 47.327456259651235,lon = 5.051558986476181, date_str="25/09/2024 19:50:00"))

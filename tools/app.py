@@ -5,20 +5,7 @@ import os
 
 app = Flask(__name__)
 
-FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
-
-@app.route('/tools/map/')
-def route_map():
-    try:
-        # Récupérer la liste des fichiers dans le dossier
-        file_list = os.listdir(FILE_DIRECTORY)
-        app.logger.info(f"Fichiers trouvés: {file_list}")
-        return render_template('map.html', files=file_list)
-    except Exception as e:
-            app.logger.error(f"Erreur lors de l'accès au dossier: {e}")
-            return "Erreur lors de l'accès aux fichiers.", 500
-        
-
+#%% STARTLIST TOOLS
 
 @app.route('/tools/startlist/')
 def route_startlist():
@@ -56,43 +43,75 @@ def rechercher():
     except Exception as e:
         result= f"Erreur lors de la requête : {e}", 500
         return render_template('startlist.html', resultats = result)
-
-
-
-@app.route('/upload_gpx', methods=['POST'])
-def upload_gpx():
-    render_template('map.html')
-    if 'gpxFile' not in request.files:
-        return "Pas de fichier sélectionné"
     
-    file = request.files['gpxFile']
+#%% MAP TOOLS
+from datetime import datetime, timedelta
 
-    if file.filename == '':
-        return "Fichier non valide"
+FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
 
-    if file and file.filename.endswith('.gpx'):
-        files_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
-        filepath = os.path.join(files_dir, file.filename)
-        file.save(filepath)
+@app.route('/tools/map/')
+def route_map():
+    default_date = datetime.now().strftime('%Y-%m-%d')  
+    default_time = (datetime.now() + timedelta(hours=1)).strftime('%H:%M') 
+    return render_template('map.html', default_date=default_date, default_time = default_time)
+    #pour affichier la liste des fichiers
+    try:
+        # Récupérer la liste des fichiers dans le dossier
+        file_list = os.listdir(FILE_DIRECTORY)
+        app.logger.info(f"Fichiers trouvés: {file_list}")
+        return render_template('map.html', files=file_list)
+    except Exception as e:
+            app.logger.error(f"Erreur lors de l'accès au dossier: {e}")
+            return "Erreur lors de l'accès aux fichiers.", 500
         
-        print(filepath)
-        return open_map(filepath)
-       
-    
-    return "Format de fichier non supporté"
 
-@app.route('/load_gpx/<filename>')
-def load_gpx(filename):
-    #chemin absolu du dossier
-    files_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
-    filepath = os.path.join(files_dir, filename)
-    print(filepath)
-    return open_map(filepath)
 
-def open_map(filepath):
+
+
+@app.route('/submit' , methods=['POST'])
+def submit_form():
     
-    coords = ms.read_gpx(filepath)
-    ms.make_map(coords)
+    if not request.form['date']:
+        return "Pas de date sélectionnée"
+    elif not request.form['time']:
+        return "Pas d'heure sélectionnée"
+    else:
+        
+        time_string = request.form['date']+' '+request.form['time']+':00'
+        print(time_string)
+        #récupérer la météo car on a bien une date et une heure en entrée
+        if 'gpxFile' not in request.files:
+            return "Pas de fichier sélectionné"
+    
+        file = request.files['gpxFile']
+
+        if file.filename == '':
+            return "Fichier non valide"
+
+        if file and file.filename.endswith('.gpx'):
+            files_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
+            filepath = os.path.join(files_dir, file.filename)
+            file.save(filepath)
+            
+            print(filepath) 
+            return open_map(filepath,time_string,int(request.form['speed'])/3.6 )
+        
+        
+        return "Format de fichier non supporté"
+
+
+
+# @app.route('/load_gpx/<filename>')
+# def load_gpx(filename):
+#     #chemin absolu du dossier
+#     files_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
+#     filepath = os.path.join(files_dir, filename)
+#     print(filepath)
+#     return open_map(filepath)
+
+def open_map(filepath, date_str,speed):
+    ms.make_map(filepath,date_str,speed)
+    
     return render_template('gpx_viewer.html')
 
 
