@@ -26,18 +26,22 @@
         
         
         <form action="/submit" method="POST" enctype="multipart/form-data">
-            <label for="date">Choisissez une date :</label>
+            <label for="date">Choisissez date :</label>
             <input type="date" id="date" name="date" value = '{{ default_date }}' >
-            <br><br>
+            <br><i>Enter date</i><br>
+            <br>
             <label for="time">Choisissez une heure :</label>
             <input type="time" id="time" name="time" value = '{{ default_time }}'>
-            <br><br>
+            <br><i>Enter time (not working yet with default time)</i><br>
+            <br>
             <label for="gpxFile">Sélectionnez un fichier GPX :</label>
             <input type="file" id="gpxFile" name="gpxFile" accept=".gpx">
-            <br><br>
+            <br><i>Enter .gpx file</i><br>
+            <br>
             <label for="speed">Sélectionnez la vitesse moyenne prévue :</label>
             <input type="number" id="speed" name="speed" min="10" max="60" value="30" step = "5">
-            <br><br>
+            <br><i>Enter est. avg. speed</i><br>
+            <br>
             <button type="submit">Charger</button>
             
 
