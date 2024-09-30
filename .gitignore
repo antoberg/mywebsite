@@ -8,3 +8,9 @@ app/map_dashboard_files/gpx_files
 
 # Ignorer les fichiers de configuration
 config.yaml
+
+# Ignorer les fichiers générés par l'IDE
+*.pyc
+__pycache__/
+.idea/
+.vscode/
