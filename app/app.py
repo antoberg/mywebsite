@@ -5,6 +5,11 @@ import os
 
 app = Flask(__name__)
 
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 #%% STARTLIST TOOLS
 
 @app.route('/tools/startlist/')
@@ -46,23 +51,24 @@ def rechercher():
     
 #%% MAP TOOLS
 from datetime import datetime, timedelta
+import time
 
-FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
+FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'map_dashboard_files')
 
-@app.route('/map/')
-def route_map():
-    default_date = datetime.now().strftime('%Y-%m-%d')  
-    default_time = (datetime.now() + timedelta(hours=1)).strftime('%H:%M') 
-    return render_template('map_dashboard.html', default_date=default_date, default_time = default_time)
-    #pour affichier la liste des fichiers
-    try:
-        # Récupérer la liste des fichiers dans le dossier
-        file_list = os.listdir(FILE_DIRECTORY)
-        app.logger.info(f"Fichiers trouvés: {file_list}")
-        return render_template('map.html', files=file_list)
-    except Exception as e:
-            app.logger.error(f"Erreur lors de l'accès au dossier: {e}")
-            return "Erreur lors de l'accès aux fichiers.", 500
+# @app.route('/map/')
+# def route_map():
+#     default_date = datetime.now().strftime('%Y-%m-%d')  
+#     default_time = (datetime.now() + timedelta(hours=1)).strftime('%H:%M') 
+#     return render_template('map_settings.html', default_date=default_date, default_time = default_time)
+#     #pour affichier la liste des fichiers
+#     try:
+#         # Récupérer la liste des fichiers dans le dossier
+#         file_list = os.listdir(FILE_DIRECTORY)
+#         app.logger.info(f"Fichiers trouvés: {file_list}")
+#         return render_template('map.html', files=file_list)
+#     except Exception as e:
+#             app.logger.error(f"Erreur lors de l'accès au dossier: {e}")
+#             return "Erreur lors de l'accès aux fichiers.", 500
         
 
 
@@ -72,38 +78,44 @@ def route_map():
 def submit_form():
     
     if not request.form['date']:
-        return "Pas de date sélectionnée"
+        time_string='nan'
     elif not request.form['time']:
-        return "Pas d'heure sélectionnée"
+        time_string = 'nan'
     else:
-        
         time_string = request.form['date']+' '+request.form['time']+':00'
-        print(time_string)
-        #récupérer la météo car on a bien une date et une heure en entrée
-        if 'gpxFile' not in request.files:
-            return "Pas de fichier sélectionné"
+    print(time_string)
     
-        file = request.files['gpxFile']
+    if 'gpxFile' not in request.files:
+        return "Pas de fichier sélectionné"
 
-        if file.filename == '':
-            return "Fichier non valide"
+    file = request.files['gpxFile']
 
-        if file and file.filename.endswith('.gpx'):
-            files_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gpx_files')
-            filepath = os.path.join(files_dir, file.filename)
-            file.save(filepath)
-            
-            print(filepath) 
-            return open_map(filepath,time_string,int(request.form['speed'])/3.6 )
+    if file.filename == '':
+        return "Fichier non valide"
+
+    if file and file.filename.endswith('.gpx'):
         
+        files_dir = os.path.join(FILE_DIRECTORY, 'gpx_files')
+        filepath = os.path.join(files_dir, file.filename)
+        file.save(filepath)
+
+        name = file.filename.split('.gpx')[0]
         
-        return "Format de fichier non supporté"
-
-
-def open_map(filepath, date_str,speed):
-    ms.make_map(filepath,date_str,speed)
+        print(filepath) 
+        return open_map(filepath,time_string,int(request.form['speed'])/3.6,name)
     
-    return render_template('gpx_viewer.html')
+    
+    return "Format de fichier non supporté"
+
+
+def open_map(filepath, time_str,speed,name):
+    ts, dist,asc,desc = ms.make_map(filepath,time_str,speed)
+    current_time = int(time.time()) 
+    dist = round(dist/1000)
+    asc = round(asc)
+    desc = round(desc)
+    print(name,dist,asc,desc)
+    return render_template('map_dashboard.html', time = current_time, map_url='static/maps/map'+ts+'.html', title= name, dist=dist, asc=asc,desc=desc)
 
 
 

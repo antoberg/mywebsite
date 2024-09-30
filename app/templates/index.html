@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AB</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index_style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
+</head>
+
+<body>
+
+    <div class="navbar">
+        <img src="{{ url_for('static', filename='images/home_logo.png') }}" alt="Logo" class="logo">
+        <a href="#home">Accueil</a>
+        <div class="dropdown">
+            <button class="dropbtn">Compétition 
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content">
+                <a href="#option1"><s>Coureurs favoris</s></a>
+                <a href="#option2"><s>Analyse de startlist</s></a>
+            </div>
+        </div> 
+        <div class="dropdown">
+            <button class="dropbtn">Outils
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content">
+                <a href="#map">Visionneuse de parcours</a>
+                <a href="#option5"><s>Calculateur de pression</s></a>
+                <a href="#option6"><s>Carte des activités</s></a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <button class="dropbtn">Personnel
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content">
+                <a href="#option4"><s>Mes sorties</s></a>
+                <a href="https://antoineberger.com/cycling/">CV sportif</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <section class="map home" id="home">
+            <h1>home</h1>
+        </section>
+        
+        <!--DEBUT SECTION CARTE-->
+        <section class="map active section" id="map">
+            <div class="row">
+                <form action="/submit" method="POST" enctype="multipart/form-data">
+                    <div class="step">
+                        <h2>Step 1 : Choose file</h2>
+                        
+                            <li><input type="file" id="gpxFile" name="gpxFile" accept=".gpx">   </li>
+                            
+                            <!-- <button type="submit" class="btn">Load file</button> -->
+                        
+                    </div>
+                    <div class="step">
+                        <h2>Step 2 : Enter weather params (optional)</h2>
+                        
+                            <li>
+                                <label for="date">Choose date :</label>
+                                <input type="date" id="date" name="date" value = '{{ default_date }}' >
+                            </li>
+                            <li>
+                                <label for="time">Choose time :</label>
+                                <input type="time" id="time" name="time" value = '{{ default_time }}'>
+                            </li>
+                            <li>
+                                <label for="speed">Select est. average speed :</label>
+                                <input type="number" id="speed" name="speed" min="10" max="60" value="30" step = "5">
+                                <td>km/h</td>
+                            </li>
+                            <!-- <button type="submit" class="btn">Load weather</button> -->
+                        
+                    </div>
+                    <div class="step">
+                        <h2>Step 3 : Load dashboard</h2>
+                        <button type="submit" class="btn">Load dashboard</button>
+                    
+                    </div>
+                </form>
+            </div>
+            
+
+        </section>
+
+
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/index_script.js') }}"></script>
+</body>
+</html>

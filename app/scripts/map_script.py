@@ -4,20 +4,40 @@ from folium.plugins import AntPath
 import numpy as np
 import pandas as pd
 import os
+from datetime import datetime
+
+
+def get_current_timestamp():
+    return (int(datetime.now().timestamp()))
 
 def read_gpx(fichier_gpx):
     with open(fichier_gpx, 'r') as f:
         gpx = gpxpy.parse(f)
 
     coords = []
+    ele = []
     for track in gpx.tracks:
         for segment in track.segments:
             for point in segment.points:
                 coords.append((point.latitude, point.longitude))
+                ele.append(point.elevation)
 
     # print(coords)
-    return coords
+    return coords,ele
 
+def calc_dist_and_ele(coords,ele):
+    distance=[]#m
+    dz=[]
+    distance.append(0.0)
+    
+    for i,p in enumerate(coords):
+        if i>0:
+            dx = (calc_distance(coords[i-1][0],p[0],coords[i-1][1],p[1] ))
+            dz.append( ele[i]-ele[i-1])
+            
+            distance.append(distance[i-1]+dx)
+    return distance,dz
+            
 
 #%% calculs distance et temps
 #calcul de la distance et du temps écoulé
@@ -60,18 +80,20 @@ def calc_distance(laA,laB,loA,loB):
 def create_map(coords):
     lats = [c[0] for c in coords]
     lons = [c[1] for c in coords]
-    center_lat = lats[round(len(coords)/2)]
-    center_lon = lons[round(len(coords)/2)]
+    center_lat = (max(lats)+min(lats))/2
+    center_lon = (max(lons)+min(lons))/2
     
-    m = folium.Map(location=[center_lat,center_lon])
+    m = folium.Map(location=[center_lat,center_lon],zoom_start=12)
+
+    folium.Marker(coords[0],popup='start',icon=folium.Icon(icon='play',color='green')).add_to(m)
+    folium.Marker(coords[len(coords)-1],popup='finish',icon=folium.Icon(icon='stop',color='red')).add_to(m)
 
     #Indiquer le sens du parcours
-    # ant_path = AntPath(coords, color="blue", weight=5, opacity=0.7, dash_array=[10, 20],delay = 1000)
-    # ant_path.add_to(m)
+    ant_path = AntPath(coords, color="blue", weight=5, opacity=0.7, dash_array=[10, 20],delay = 1000)
+    ant_path.add_to(m)
 
-    
     folium.PolyLine(coords,color='red',).add_to(m)
-
+    print('map created')
     return m
 
 #%% ajout de la météo à la map
@@ -154,28 +176,33 @@ def add_wind_vectors_to_map(df_weather, m):
     return m
 def save_map(m):
     
-
+    ts = str(get_current_timestamp())
     # Construire le chemin vers le fichier dans 'tools/templates'
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    template_file_path = os.path.join(current_dir, '../templates/map.html')
+    template_file_path = os.path.join(current_dir, '../static/maps/map'+ts+'.html')
     m.save(template_file_path)
+    print('map saved')
+    return ts
 
 #%% FONCTION GLOBALE
 
 def make_map(filepath, date_str, speed):
-    coords = read_gpx(filepath)
-
+    coords,ele = read_gpx(filepath)
+    
+    dist, dz = calc_dist_and_ele(coords,ele)
+    asc = sum([x for x in dz if x>0])
+    desc = sum([x for x in dz if x<0])
     #création de la map
     m = create_map(coords)
-    print(m)
-    if date_str != '':
+    if date_str != 'nan':
         #récupération de la météo
         df_weather = get_weather(coords, date_str, speed)
         print(df_weather)
         #ajout des vecteurs vent
         m = add_wind_vectors_to_map(df_weather, m)
-        #sauvegarde de la map dans un fichier
-        save_map(m)
+    #sauvegarde de la map dans un fichier
+    return save_map(m), max(dist), asc,desc
+    
         
         
 
