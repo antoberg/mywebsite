@@ -226,8 +226,17 @@ def make_map(filepath, date_str, speed):
         print(df_weather)
         #ajout des vecteurs vent
         m = add_wind_vectors_to_map(df_weather, m)
+    else:
+        df_weather = pd.DataFrame({
+            'distance':[],
+            'wind_speed':[],
+            'temp':[],
+            'rain':[]
+
+        })
 
     #sauvegarde de la map dans un fichier
+    
     return save_map(m), df_route, df_weather
     
         
