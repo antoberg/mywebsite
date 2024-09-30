@@ -1,1 +1,10 @@
-app/map_dashboard_files
+
+# Ignorer les fichiers temporaires
+*.tmp
+*.log
+
+# Ignorer le dossier 'build'
+app/map_dashboard_files/gpx_files
+
+# Ignorer les fichiers de configuration
+config.yaml
