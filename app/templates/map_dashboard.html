@@ -5,22 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Map dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/map_dashboard_style.css') }}?v={{ time }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-    
+    <div class="row">
+        <div class="board-title">
+            <div class="title">
+                <h1>{{ title }}</h1>
+                <h2>{{dist}} km | {{asc}} m | {{desc}} m</h2>
+            </div>
 
-    <div class="map_section">
-        <h1>{{ title }}</h1>
-        <h2>{{dist}} km | {{asc}} m | {{desc}} m</h2>
-        <iframe class="map" src="{{ map_url }}"  frameborder="0"></iframe>
-      
-    </div>
-    <div class="weather"></div>
-        <!-- <h2>Weather</h2> -->
+        </div>
     </div>
 
-    
+    <div class="row">
+        <div class="board-map">
+            <div class="map_section">
+        
+                <iframe class="map" src="{{ map_url }}"  frameborder="0"></iframe>
+        
+                <div class="chart-container">
+                    <canvas id="gc"></canvas>
+                </div>
+        
+            </div>
 
+        </div>
+        <div class="board-map">
+            <div class="weather_section">
+                <h2>Précipitations</h2>
+                <div class="weather_chart-container">
+                    <canvas id="wc0"></canvas>
+                </div>
+                <h2>Vent</h2>
+                <div class="weather_chart-container">
+                    <canvas id="wc1"></canvas>
+                </div>
+                <h2>Température</h2>
+                <div class="weather_chart-container">
+                    <canvas id="wc2"></canvas>
+                </div>
+        
+                
+            </div>
+
+        </div>
+    </div>
+
+   
+    
+    <script>
+        const xData = JSON.parse('{{ x_data | tojson | safe }}');
+        const yData = JSON.parse('{{ y_data | tojson | safe }}');
+        const xwData = JSON.parse('{{ x_weather_data | tojson | safe }}');
+        const tempData = JSON.parse('{{ temp_data | tojson | safe }}');
+        const rainData = JSON.parse('{{ rain_data | tojson | safe }}');
+        const windData = JSON.parse('{{ wind_data | tojson | safe }}');
+    </script>
+
+    <script src="{{ url_for('static', filename='js/map_dashboard_script.js') }}?v={{ time }}">
+
+        
+    </script>
 </body>
 </html>

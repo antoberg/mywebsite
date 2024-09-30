@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
+import numpy as np
 import scripts.startlist_script as ss
 import scripts.map_script as ms
 import os
@@ -109,13 +110,28 @@ def submit_form():
 
 
 def open_map(filepath, time_str,speed,name):
-    ts, dist,asc,desc = ms.make_map(filepath,time_str,speed)
-    current_time = int(time.time()) 
-    dist = round(dist/1000)
-    asc = round(asc)
-    desc = round(desc)
-    print(name,dist,asc,desc)
-    return render_template('map_dashboard.html', time = current_time, map_url='static/maps/map'+ts+'.html', title= name, dist=dist, asc=asc,desc=desc)
+    
+    
+    ts, df_route, df_weather = ms.make_map(filepath,time_str,speed)
+    #clé pour actualiser les statics du dashboard
+    current_time = int(time.time())
+    print(ts)
+    #calculs sur df
+    total_dist = round(max(df_route['distance'])/1000)
+    asc = round(sum([x for x in df_route['dz'] if x>0]))
+    desc = round(sum([x for x in df_route['dz'] if x<0]))
+    dist_list = [round(x/1000) for x in df_route['distance']]
+    dist_weather_list = [round(x/1000) for x in df_weather['distance']]
+    ele_list = [round(x) for x in df_route['elevation']]
+    wind_data = [round(x*3.6) for x in df_weather['wind_speed']]
+    
+
+    
+
+
+    return render_template('map_dashboard.html', time = current_time, map_url='static/maps/map'+ts+'.html', 
+                           title= name, dist=total_dist, asc=asc,desc=desc, x_data = dist_list, y_data = ele_list,
+                           x_weather_data = dist_weather_list, wind_data=wind_data,temp_data = list(df_weather['temp']), rain_data = list(df_weather['rain']))
 
 
 

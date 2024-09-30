@@ -27,6 +27,7 @@ def get_exclusion_list(timestamp):
     else:
         accuracy_str = "ERROR : ride date too far from now"
     print("accuracy : ", accuracy_str)
+    print(timestamp)
     exclusion_list.remove(accuracy_str)
 
     return accuracy_str, exclusion_list
@@ -58,19 +59,22 @@ def get_forecast(lat, lon, timestamp):
     json_data = request_data(lat,lon, exclusion_list)
     forecast_index = get_closest_forecast(timestamp,json_data, accuracy_str)
     forecast = json_data[accuracy_str][forecast_index]
+   
+    if 'rain' in forecast:
+        rain = forecast['rain']
+        if isinstance(rain, dict):
+            rain = rain['1h']
+    else:
+        rain = 0.0
 
-    # print("Heure :",
-    #       "\n   Heure de la prévision : ",forecast['dt'],
-    #       '\n   Heure souhaitée : ',timestamp,
-    #       '\n   Décalage : ',round((forecast['dt']- timestamp)/60,1),'minutes (>0 => heure forecast plus tard que heure souhaitée)')
-    
-    # print('Prévision : ')
-    # print("     Descritpion :",forecast['weather'][0]['description'])
-    # print("Vent :",
-    #       '\n   vitesse : ',forecast['wind_speed'],
-    #       '\n   direction :',forecast['wind_deg'])
+    if isinstance(forecast['temp'],dict): #si daily
+        print(forecast['temp'])
+        temp = forecast['temp']['day']
+    else:
+        temp = forecast['temp']
 
-    return round(forecast['wind_speed'],1), int(forecast['wind_deg'])
+
+    return round(forecast['wind_speed'],1), int(forecast['wind_deg']), round(temp-273.15),rain, (forecast['pop'])
 
 
 

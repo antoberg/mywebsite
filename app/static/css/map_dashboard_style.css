@@ -5,41 +5,131 @@
     --bg-black-50:#e8dfec;
     --text-black-900:#302e4d;
     --text-black-700:#504e70;
-    --skin-text-color:#37b182;
+    --skin-text-color:#03b26f;
 }
 body
 {
     background: var(--bg-black-900);
     line-height: 1.5;
-    font-size: 16px;
+    font-size: 14px;
     font-family: 'Poppins' sans-serif;
+    display: flex;
+    flex-direction: column;
+    
+}
+.row
+{
+    
+    
+    width: 100%;
+
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    
+}
+.board-title
+{
+    background-color: var(--bg-black-100);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    margin: 15px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: fit-content;
+}
+.title 
+{    
+    width:100%;
+    height: 100px;   
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     
 }
 
-body .map_section
+.title h1 
 {
-    width: 100vw;
-    height: 800px;
+    margin: 0;
+    color: var(--skin-text-color)
     
+}
+.title h2
+{
+    margin: 0;
+    color: var(--text-black-900)
+}
+.board-map
+{
+    background-color: var(--bg-black-100);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
     display: flex;
-    justify-content: center;  /* Centre horizontalement */
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    height: fit-content;
+
+    margin: 15px;
+}
+.map_section
+{
+    
+    width: 100%;
+    height: 800px;
+    padding: 15px;
+    
+
+    display: flex;
     align-items: center;      /* Centre verticalement */
+    justify-content: center;
     flex-direction: column;   /* Disposition en colonne pour empiler les éléments */
-  
+    
    
 }
-body .map_section iframe
+.map_section .map
 {
-    width:75%;              
-    height: 100%;
+    height: 70%;
+    width: 100%;
 }
-.map_section h1 
+.map_section .chart-container 
 {
-    color: var(--skin-text-color)
+   
+    height: 30%;
+    width: 100%;
+    margin-top: 10px;
+
 }
-.map_section h2
+canvas {
+    display: block;
+}
+
+.weather_section
 {
-    color: var(--text-black-900)
+    
+    width: 100%;
+    height: 800px;
+    padding: 15px;
+
+    display: flex;
+    align-items: center;      /* Centre verticalement */
+    justify-content: center;
+    flex-direction: column;   /* Disposition en colonne pour empiler les éléments */
+}
+.weather_section .weather_chart-container 
+{
+   
+    max-height: 33.3%;
+    width: 100%;
+    
+
 }
 
 

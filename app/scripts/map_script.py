@@ -1,6 +1,6 @@
 import gpxpy
 import folium
-from folium.plugins import AntPath
+from folium.plugins import AntPath,Fullscreen
 import numpy as np
 import pandas as pd
 import os
@@ -25,9 +25,10 @@ def read_gpx(fichier_gpx):
     # print(coords)
     return coords,ele
 
-def calc_dist_and_ele(coords,ele):
+def make_route_df(coords,ele):
     distance=[]#m
     dz=[]
+    dz.append(0.0)
     distance.append(0.0)
     
     for i,p in enumerate(coords):
@@ -36,7 +37,17 @@ def calc_dist_and_ele(coords,ele):
             dz.append( ele[i]-ele[i-1])
             
             distance.append(distance[i-1]+dx)
-    return distance,dz
+
+    df = pd.DataFrame(
+        {
+        'coords' : coords,
+        'distance' : distance,
+        'elevation' : ele,
+        'dz' : dz
+        }
+    )
+
+    return df
             
 
 #%% calculs distance et temps
@@ -83,7 +94,9 @@ def create_map(coords):
     center_lat = (max(lats)+min(lats))/2
     center_lon = (max(lons)+min(lons))/2
     
-    m = folium.Map(location=[center_lat,center_lon],zoom_start=12)
+    m = folium.Map(location=[center_lat,center_lon],zoom_start=10)
+    
+    Fullscreen(position='topright', title='Plein écran', titleCancel='Quitter plein écran').add_to(m)
 
     folium.Marker(coords[0],popup='start',icon=folium.Icon(icon='play',color='green')).add_to(m)
     folium.Marker(coords[len(coords)-1],popup='finish',icon=folium.Icon(icon='stop',color='red')).add_to(m)
@@ -135,8 +148,13 @@ def get_weather(coords, date_string ,bike_speed):
     #points auquels on récupère la météo
     df = calc_travel_time(coords,bike_speed)
     print(df)
-    weather_indexes = np.linspace(0,len(coords)-1,10).astype(int)
+    #durée entre chaque relevé en secondes
+    time_step = 20*60
+    nb_indexes = round(max(df['time'])/time_step-1)
+    print('nombre indexes météo : ',nb_indexes)
+    weather_indexes = np.linspace(0,len(coords)-1,nb_indexes).astype(int)
     print(weather_indexes)
+    
     
 
     df = df.iloc[weather_indexes]
@@ -144,20 +162,27 @@ def get_weather(coords, date_string ,bike_speed):
 
     speedl = []
     degl = []
+    templ=[]
+    rainl=[]
 
     timestamp = get_date_timestamp(date_string)
+    print('target_timestamp',timestamp)
     
     for i in weather_indexes:
         
-        timestamp += df['time'][i]
-        speed, deg = get_forecast(df['coords'][i][0],df['coords'][i][1], timestamp)
+        ts = timestamp + df['time'][i]
+        speed, deg, temp, rain, pop = get_forecast(df['coords'][i][0],df['coords'][i][1], ts)
         speedl.append(speed)
         degl.append(deg)
+        templ.append(temp)
+        rainl.append(rain)
     
     
     
     df['wind_speed'] = speedl
     df['wind_deg'] = degl
+    df['temp'] = templ
+    df['rain'] = rainl
 
     df = df.reset_index(drop=True)
 
@@ -187,12 +212,13 @@ def save_map(m):
 #%% FONCTION GLOBALE
 
 def make_map(filepath, date_str, speed):
-    coords,ele = read_gpx(filepath)
     
-    dist, dz = calc_dist_and_ele(coords,ele)
-    asc = sum([x for x in dz if x>0])
-    desc = sum([x for x in dz if x<0])
+    print(date_str)
+    coords, ele = read_gpx(filepath)
+    df_route= make_route_df(coords, ele)
+    
     #création de la map
+    coords = df_route['coords']
     m = create_map(coords)
     if date_str != 'nan':
         #récupération de la météo
@@ -200,8 +226,9 @@ def make_map(filepath, date_str, speed):
         print(df_weather)
         #ajout des vecteurs vent
         m = add_wind_vectors_to_map(df_weather, m)
+
     #sauvegarde de la map dans un fichier
-    return save_map(m), max(dist), asc,desc
+    return save_map(m), df_route, df_weather
     
         
         
