@@ -94,7 +94,7 @@ def create_map(coords):
     center_lat = (max(lats)+min(lats))/2
     center_lon = (max(lons)+min(lons))/2
     
-    m = folium.Map(location=[center_lat,center_lon],zoom_start=10)
+    m = folium.Map(location=[center_lat,center_lon],zoom_start=11)
     
     Fullscreen(position='topright', title='Plein écran', titleCancel='Quitter plein écran').add_to(m)
 

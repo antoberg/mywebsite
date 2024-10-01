@@ -19,13 +19,11 @@ body
 }
 .row
 {
-    
-    
-    width: 100%;
-
     display: flex;
-    justify-content: center; 
-    align-items: center;
+    width: 100vw;
+    justify-content: center;
+    position: relative;
+    flex-wrap: wrap;
     
 }
 .board-title
@@ -74,10 +72,14 @@ body
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 50%;
+    width: calc(50% - 4*15px);
     height: fit-content;
 
     margin: 15px;
+}
+.hidden
+{
+ display: none;
 }
 .map_section
 {
@@ -130,6 +132,17 @@ canvas {
     width: 100%;
     
 
+}
+@media (max-width:767px)
+{
+    .carte,
+    .meteo
+    {
+        flex: 0 0 90%;
+        max-width: 100%;
+        
+    }
+    
 }
 
 

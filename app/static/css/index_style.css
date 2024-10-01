@@ -1,11 +1,19 @@
 /* Style de la barre de navigation */
 :root {
+    /* couleurs */
     --bg-black-900:#f2f2fc;
     --bg-black-700:#fdf9ff;
     --bg-black-50:#e8dfec;
     --text-black-900:#302e4d;
     --text-black-700:#504e70;
     --strava:#FC4C02;
+    --skin-color:#4e7054;
+    --header-text:#54515e;
+
+
+    /* fonts */
+    --main-font: 'Roboto', sans-serif;
+    
 }
 
 
@@ -13,72 +21,310 @@ body {
     font-family: Arial, sans-serif;
     background: var(--bg-black-900);
     color:  var(--text-black-900);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
 }
+
 
 .row {
     display: flex;
     width: 100vw;
-    
     justify-content: center;
-    
-    
-    
+    position: relative;
+    flex-wrap: wrap;
 }
 
-.btn
+
+
+
+.sub-btn-container{
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+   
+
+}
+
+.sub-btn-container .btn
 {
+
     font-size: 16px;
-    font-weight: 500;
-    padding: 6px 20px;
-    color: var(--bg-black-50);
+    font-weight: 600;
+    padding: 15px 40px;
+    
     border-radius: 40px;
     display: inline-block;
     white-space: nowrap;
     border: none;
     background: var(--strava);
     transition: all 0.3s ease;
-    
-    
+    color: white;
+    opacity: 1;
+
 }
 .btn:hover
 {
     transform: scale(1.05);
 }
 
+
+
 .step {
     
     height: fit-content;
     border-radius: 10px;
-    background: var(--text-black-700);
-    padding: 30px;
-    margin: 50px;
-    color: var(--bg-black-50);
+    border: 1px solid var(--bg-black-50);
+    background: var(--bg-black-700);
+    
+    padding: 30px 30px;
+    
+    margin: 15px;
+    color: var(--text-black-700);
+    max-width: 500px;
+
+    
     
 }
 .step h2{
     
     
-    color: var(--bg-black-700);
-    margin-bottom: 30px;
+    color: var(--strava);
+    margin-bottom: 15px;
+    font-size: 20px;
     
 }
-.step li{
-    
+.step h3{
+    font-size: 15px;
+    color: var(--text-black-900)
+}
+
+.linput
+{
     list-style-type: none;
-    margin-bottom: 10px;
+}
+.files-grid a
+{
+    font-size: 14px;
+    text-decoration: none;
+    color:inherit;
     
+}
+.files-grid li
+{
+    list-style-type:circle;
+    
+
+    
+}
+
+.files-grid a .selected /* à gérer en js*/
+{
+    font-weight: bold;
+    color: var(--strava);
     
 }
 
 
+.step li{
+    /* list-style-type: none; */
+    font-family: var(--main-font)
+}
+
+.step .params-list{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center ;
+    text-align: center;
+    list-style-type: none;
+}
+
+.step .params-list input{
+    text-align: center;
+    width: fit-content;
+    font-family: var(--main-font)
+
+}
+.step .params-list span{
+    margin-left: 3px;
+    font-size: 12px;
+    
+
+}
+
+.step .icon{
+    height: 30px;
+
+}
+.step .status{
+    height: 17px;
+    display: flex;
+    margin-top: 30px;
+    align-items: center;
+    justify-content: center;
+}
+.step .status-icon{
+    height: 100%;
+}
+.step .status-text{
+    margin-left: 5px;
+    font-family: var(--main-font);
+    font-size: 13px;
+}
+.step .files-grid
+{
+
+    display: flex;
+    width: 100%;
+    
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    
+    
+}
+.step .files-grid div
+{
+    padding-right: 50px;
+    
+    
+}
+
+.logo-container
+{
+    
+    width: 100%;
+    height: 80px;
+    
+    position: fixed;
+    left: 0;
+    top: 0;
+    align-content: center;
+    justify-content: center;
+    
+    background-color: var(--bg-black-700);
+    z-index: 10;
+    display: none;/*caché par défaut*/
+    
+}
+.logo-container .logo
+{
+    
+    height: 100%;
+}
 
 .navbar {
+   
+    background-color: var(--bg-black-700);
+    
+
+    width: 100%;
+    height: 80px;
+    
+    position: fixed;
+    left: 0;
+    top: 0;
+    /* padding: 30px; */
+    border-bottom: 1px solid var(--bg-black-50);
+
     display: flex;
-    background-color: var(--bg-black-100);
-    overflow: hidden;
+    justify-content: center;
     align-items: center;
+    z-index: 10;
+    /* transition: all 0.3s ease; */
+
+
+    font-family: var(--main-font)
+    
     
 }
+.navbar li
+{
+    list-style-type: none;
+    
+}
+
+
+
+.navbar .nav-toggler
+{
+    height: 40px;
+    width: 45px;
+    border: 1px solid var(--bg-black-50);
+    cursor: pointer;
+    position: fixed;
+    left: 300px;
+    top: 20px;
+    border-radius: 5px;
+    background: var(--bg-black-700);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+.navbar .nav-toggler span
+{
+    height: 2px;
+    width: 18px;
+    background: var(--skin-color);
+    display: inline-block;
+    position: relative;
+}
+.navbar .nav-toggler.open span
+{
+    background-color: transparent;
+}
+.navbar .nav-toggler span::before
+{
+    content: '';
+    height: 2px;
+    width: 18px;
+    background: var(--skin-color);
+    position: absolute;
+    top: -6px;
+    left: 0;
+}
+.navbar .nav-toggler.open span::before
+{
+    transform: rotate(45deg);
+    top: 0;
+}
+.navbar .nav-toggler span::after
+{
+    content: '';
+    height: 2px;
+    width: 18px;
+    background: var(--skin-color);
+    position: absolute;
+    top: 6px;
+    left: 0;
+}
+.navbar .nav-toggler.open span::after
+{
+    transform: rotate(-45deg);
+    top: 0;
+}
+
+.navbar .nav-column
+{
+    font-weight: bold;
+    
+}
+
+.navbar .dropdown .nav-column.active a
+{
+    padding: 5px 10px;
+    background: var(--strava);
+    color: var(--bg-black-700);
+    
+}
+.navbar a:hover, .dropdown:hover .dropbtn {
+    
+    color: var(--strava);
+}
+
 
 .navbar a {
     float: left;
@@ -89,15 +335,13 @@ body {
     text-decoration: none;
 }
 
-.navbar a:hover {
-    background-color: #ddd;
-    color: black;
-}
+
 .logo {
     height: 60px;
     width: auto;
     vertical-align: middle;
-    margin-left: 14px;
+    
+    margin-right: 15px;
 }
 
 .dropdown {
@@ -106,7 +350,7 @@ body {
 }
 
 .dropdown .dropbtn {
-    font-size: 16px;
+    font-size: inherit;
     border: none;
     outline: none;
     color: var(--text-black-100);
@@ -114,12 +358,10 @@ body {
     background-color: inherit;
     font-family: inherit;
     margin: 0;
+    
 }
 
-.navbar a:hover, .dropdown:hover .dropbtn {
-    background-color: #ddd;
-    color: black;
-}
+
 
 .dropdown-content {
     display: none;
@@ -146,12 +388,156 @@ body {
 .dropdown:hover .dropdown-content {
     display: block;
 }
-/* Par défaut, les sections ne sont pas visibles */
-section {
-    display: none;
+.section
+{
+    
+    background: var(--bg-black-900);
+    min-height: calc(100vh - 50px);
+    display: block;
+    padding: 0 30px;
+    opacity: 1;
+    position: relative;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0; 
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: all 0.3s ease;
+    
+    flex-grow: 1;            /* Prend tout l'espace restant */
+
+    
+    
+}
+.section p{
+    color: var(--header-text);
 }
 
-/* La section active est visible */
-section.active {
-    display: block;
+.section.hidden
+{
+    display: none;
+}
+.section.back-section
+{
+    z-index: 1;
+}
+.section.active
+{
+    z-index: 2;
+    opacity: 1;
+    /* animation: slideSection 1s ease;  */
+}
+.section header
+{
+    position: relative;
+    margin-top: 100px;
+    width: 100%;
+    text-align: center;
+    
+    
+}
+
+.section header h2
+{
+    color: var(--header-text);
+    font-weight: 5;
+}
+
+footer
+{
+    position: relative;
+    background-color: var(--text-black-900); /* Couleur de fond */
+    color: var(--header-text); /* Couleur du texte */
+    text-align: center; /* Centrer le texte */
+    /* position: fixed;  */
+   
+    width: 100%; /* Prend toute la largeur */
+    min-height: 50px;
+    height: fit-content;
+    z-index:10;
+    
+    /* top:120px; */
+    font-family: var(--main-font);
+
+    /* orga de l'inte du footer */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    
+}
+footer a, p {
+    
+    color:var(--bg-black-900);
+    margin-right: 10px;
+}
+
+
+
+
+
+@media (max-width:1199px)
+{
+    .logo-container
+    {
+        display: flex;
+        
+
+    }
+    
+    .navbar
+    {
+        top: -80px;
+    }
+    .navbar.open 
+    {
+        /* top: 0; */
+        width: 100vw;
+        height: 100vh;
+        
+        
+        /* padding: 30px; */
+        border-right: 1px solid var(--bg-black-50);
+        flex-direction: column;
+
+
+    
+        
+    }
+
+    .navbar .nav-toggler
+    {
+        display: flex;
+        left: 30px;
+    }
+    /* .navbar .nav-toggler.open 
+    {
+        left: 300px;
+    } */
+
+   
+    .section
+    {
+        left: 0;
+        
+        
+    }
+    .section.open 
+    {
+        left: 270px;
+    }
+}
+
+@media (max-width:767px)
+{
+    .file,
+    .params
+    {
+        flex: 0 0 90%;
+        max-width: 100%;
+        
+    }
+    
 }

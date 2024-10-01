@@ -2,14 +2,28 @@ from flask import Flask, render_template, request, jsonify
 import numpy as np
 import scripts.startlist_script as ss
 import scripts.map_script as ms
-import os
+from datetime import datetime, timedelta
+import time
+import os   
+
+#versionner les fichiers statics pour éviter d'utiliser ceux en cache navigateur
+current_time = int(time.time())
 
 app = Flask(__name__)
+
+FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'map_dashboard_files')
+GPX_FILES_DIRECTORY = os.path.join(FILE_DIRECTORY, 'gpx_files')
+GPX_FILES_DIRECTORY_RECENT =  os.path.join(os.path.join(GPX_FILES_DIRECTORY, 'recent'))
+GPX_FILES_DIRECTORY_RACES =  os.path.join(os.path.join(GPX_FILES_DIRECTORY, 'races'))
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    recent_files = os.listdir(os.path.join(GPX_FILES_DIRECTORY, 'recent'))
+    race_files = os.listdir(os.path.join(GPX_FILES_DIRECTORY, 'races'))
+    
+    return render_template('index.html', time = current_time, race_files=race_files,recent_files=recent_files)
+
 
 #%% STARTLIST TOOLS
 
@@ -51,10 +65,9 @@ def rechercher():
         return render_template('startlist.html', resultats = result)
     
 #%% MAP TOOLS
-from datetime import datetime, timedelta
-import time
 
-FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'map_dashboard_files')
+
+
 
 # @app.route('/map/')
 # def route_map():
@@ -77,44 +90,68 @@ FILE_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'map_d
 
 @app.route('/submit' , methods=['POST'])
 def submit_form():
-    
+    weather_request = 'hidden' #par défaut
     if not request.form['date']:
         time_string='nan'
     elif not request.form['time']:
         time_string = 'nan'
     else:
         time_string = request.form['date']+' '+request.form['time']+':00'
+        weather_request = ''
+
     print(time_string)
+    print(request.files)
+
+   
+
+
+    if ('gpxFile' in request.files) and request.files['gpxFile'].filename != '' :
+
+        file = request.files['gpxFile']
+        print(file)
+
     
-    if 'gpxFile' not in request.files:
-        return "Pas de fichier sélectionné"
+        if  not (file and file.filename.endswith('.gpx')):
+            return "Fichier GPX importé mais format ou extension non valide"
 
-    file = request.files['gpxFile']
+        else:
+            
+            files_dir = os.path.join(FILE_DIRECTORY, 'gpx_files')
+            filepath = os.path.join(files_dir, file.filename)
+            file.save(filepath)
 
-    if file.filename == '':
-        return "Fichier non valide"
-
-    if file and file.filename.endswith('.gpx'):
-        
-        files_dir = os.path.join(FILE_DIRECTORY, 'gpx_files')
-        filepath = os.path.join(files_dir, file.filename)
-        file.save(filepath)
-
-        name = file.filename.split('.gpx')[0]
-        
-        print(filepath) 
-        return open_map(filepath,time_string,int(request.form['speed'])/3.6,name)
+            print(filepath)
+            name = file.filename.split('.gpx')[0] 
+            return open_map(filepath,time_string,int(request.form['speed'])/3.6,name,weather_request)
     
+
     
-    return "Format de fichier non supporté"
+    else:
+
+        if('filename' in request.form) and request.form.get('filename') != '':
+            
+            
+            filename = request.form.get('filename')
+            print('filename',filename, request.form)
+            name = filename.split('.gpx')[0]
+            filepath = os.path.join(GPX_FILES_DIRECTORY_RECENT, filename)
+            if not os.path.isfile(filepath):
+                filepath = os.path.join(GPX_FILES_DIRECTORY_RACES, filename)
+                if not os.path.isfile(filepath):
+                    return "Fichier sélectionné introuvable"
+                
+            return open_map(filepath,time_string,int(request.form['speed'])/3.6,name, weather_request)
+        else:
+            return "Aucun fichier importé ni sélectionné"
+    
 
 
-def open_map(filepath, time_str,speed,name):
+def open_map(filepath, time_str,speed,name,weather_request):
     
     
     ts, df_route, df_weather = ms.make_map(filepath,time_str,speed)
     #clé pour actualiser les statics du dashboard
-    current_time = int(time.time())
+    
     print(ts)
     #calculs sur df
     total_dist = round(max(df_route['distance'])/1000)
@@ -131,6 +168,7 @@ def open_map(filepath, time_str,speed,name):
 
     return render_template('map_dashboard.html', time = current_time, map_url='static/maps/map'+ts+'.html', 
                            title= name, dist=total_dist, asc=asc,desc=desc, x_data = dist_list, y_data = ele_list,
+                           weather_request=weather_request,#=active si la météo est requise par le user
                            x_weather_data = dist_weather_list, wind_data=wind_data,temp_data = list(df_weather['temp']), rain_data = list(df_weather['rain']))
 
 
