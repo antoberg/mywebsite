@@ -40,6 +40,8 @@ const nav = document.querySelector(".navbar"),
                             
                             dropList[h].querySelector("span").classList.remove("active");
                             
+
+                            
                         }
                 }
                 
@@ -47,6 +49,7 @@ const nav = document.querySelector(".navbar"),
                 
                 // on active ce bouton de column
                 dropList[k].querySelector("span").classList.add("active");
+                
                 // on active ce bouton de section
                 this.classList.add("active")
                 showSection(this);
