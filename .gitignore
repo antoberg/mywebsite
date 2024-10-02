@@ -4,7 +4,7 @@
 *.log
 
 # Ignorer le dossier 'build'
-app/map_dashboard_files/gpx_files
+# app/map_dashboard_files/gpx_files
 
 # Ignorer les fichiers de configuration
 config.yaml
