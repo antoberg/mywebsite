@@ -5,6 +5,8 @@
 
 # Ignorer le dossier 'build'
 # app/map_dashboard_files/gpx_files
+app/static/maps
+
 
 # Ignorer les fichiers de configuration
 config.yaml
