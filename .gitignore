@@ -4,8 +4,8 @@
 *.log
 
 # Ignorer le dossier 'build'
-# app/map_dashboard_files/gpx_files
-app/static/maps
+# app/files
+
 
 
 # Ignorer les fichiers de configuration
