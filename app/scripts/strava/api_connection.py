@@ -1,14 +1,113 @@
+# ====================== Importations ======================
+
 import json
 import os
 import requests
 import time
-import webbrowser
+
+# ================== Constantes et Variables =================
 
 client_id = '55219'
 client_secret = 'efca1851af97b16a2250e408f5543dfb206aca34'
-redirect_uri = 'http://localhost/'
 
-def request_token(client_id: str, client_secret: str, code: str) -> requests.Response:
+# =================== FONCTIONS GENERIQUES =========================
+def get_athlete_token(athlete_id, tokenPath : os.path): #--> renvoit le token d'un athlete donné
+    """
+    Fonction perso pour faciliter l'accès au token dans l'app
+    si il existe
+    - renvoit le json de l'athlete en question tq : { "id" : {}} 
+    - sinon renvoit None
+    """
+    with open(tokenPath, 'r') as token:
+                data = json.load(token)
+
+    filled=0
+    for i,v in enumerate(data):
+        dict_id = next(iter(v))
+        
+        if dict_id == str(athlete_id) and filled == 0:
+            data_athlete = data[i][dict_id]
+            filled = 1
+    
+    if filled == 0:
+        data_athlete = None
+
+    return data_athlete
+
+def write_token(athlete_id: int, token: dict, tokenPath : os.path):
+    """
+    Writes the token information to a JSON file.
+
+    Args:
+        filename (str): Name of the JSON file.
+        athlete_id (int): ID of the athlete.
+        token (dict): Dictionary containing token information.
+    """
+    
+    if os.path.exists(tokenPath):
+        with open(tokenPath, 'r') as file:
+            data = json.load(file)
+
+        filled=0
+        for i,v in enumerate(data):
+            dict_id = next(iter(v))
+            print(dict_id)
+            if dict_id == str(athlete_id) and filled == 0:
+                data[i][dict_id] = token
+                filled = 1
+        
+        if filled == 0:
+            athlete_data = {}
+            athlete_data[f"{athlete_id}"] = token
+            data.append(athlete_data)
+            
+    else:
+        data = []
+        athlete_data = {}
+        athlete_data[f"{athlete_id}"] = token
+        data.append(athlete_data)
+
+    with open(tokenPath, 'w') as file:
+        json.dump(data, file)
+
+# =================== RECUPERATION TOKEN VALIDE =========================
+
+
+def check_token_validity(athlete_id: int, tokenPath : os.path):
+    """
+    - Vérifier si l'utilisateur est bien connecté et à accès au données
+    - Rafraichis le token
+    """
+    
+    access = False
+    if os.path.exists(tokenPath):
+        with open(tokenPath, 'r') as token:
+            data = json.load(token)
+        if f"{athlete_id}" in data:
+            athlete = data[f"{athlete_id}"]
+            if 'errors' in athlete:
+                access_string = "access token erroné dans le json"
+            else:
+                username = athlete['athlete']['username']
+                if athlete['expires_at'] < time.time():
+                    refresh_token(client_id, client_secret, athlete['refresh_token'], athlete_id)
+                    access_string = f'{username} connecté - access token refreshed car il était expiré'
+                else:
+                    access_string = f'{username} connecté avec succès'
+                    access = True
+        else:
+            access_string = "athlete id absent du json"
+    else:
+        access_string = "strava_token.json inexistant"
+
+    print('=======================================')
+    print('ACCES AU DONNES STRAVA :',access_string)
+    print('id :',athlete_id)
+    print('=======================================')
+    return access
+
+def request_token(code: str) -> requests.Response:
+
     """
     Requests an access token from the Strava API using the provided code.
 
@@ -27,7 +126,24 @@ def request_token(client_id: str, client_secret: str, code: str) -> requests.Res
                                    'grant_type': 'authorization_code'})
     return response
 
-def refresh_token(client_id: str, client_secret: str, refresh_token: str) -> requests.Response:
+def request_authorization(redirect_uri : str):
+    """
+    Initiates the authorization process with Strava.
+
+    Args:
+        filename (str): Name of the JSON file.
+        athlete_id (int): ID of the athlete.
+    """
+    #----> important : approval_prompt : auto permet de se connecter sans demander les authorisations à chaque fois, sinon mettre force
+    request_url = f'http://www.strava.com/oauth/authorize?client_id={client_id}' \
+                    f'&response_type=code&redirect_uri={redirect_uri}' \
+                    f'&approval_prompt=auto' \
+                    f'&scope=profile:read_all,activity:read_all,read'
+
+    # webbrowser.open(request_url)
+    return request_url
+ 
+def refresh_token(client_id: str, client_secret: str, refresh_token: str, athlete_id, tokenPath : os.path) -> requests.Response:
     """
     Requests a new access token using a refresh token.
 
@@ -44,84 +160,19 @@ def refresh_token(client_id: str, client_secret: str, refresh_token: str) -> req
                                    'client_secret': client_secret,
                                    'grant_type': 'refresh_token',
                                    'refresh_token': refresh_token})
-    return response
-
-def write_token(filename: str, athlete_id: int, token: dict):
-    """
-    Writes the token information to a JSON file.
-
-    Args:
-        filename (str): Name of the JSON file.
-        athlete_id (int): ID of the athlete.
-        token (dict): Dictionary containing token information.
-    """
-    if os.path.exists(f'./{filename}.json'):
-        with open(f'{filename}.json', 'r') as file:
-            data = json.load(file)
-    else:
-        data = {}
-
-    data[f"{athlete_id}"] = token
-
-    with open(f'{filename}.json', 'w') as file:
-        json.dump(data, file)
-
-def request_authorization(filename: str, athlete_id: int):
-    """
-    Initiates the authorization process with Strava.
-
-    Args:
-        filename (str): Name of the JSON file.
-        athlete_id (int): ID of the athlete.
-    """
-    request_url = f'http://www.strava.com/oauth/authorize?client_id={client_id}' \
-                    f'&response_type=code&redirect_uri={redirect_uri}' \
-                    f'&approval_prompt=force' \
-                    f'&scope=profile:read_all,activity:read_all'
-
-    webbrowser.open(request_url)
-    code = input('Insert the code from the url: ')
-
-    token = request_token(client_id, client_secret, code)
-    #Save json response as a variable
-    strava_token = token.json()
-    # Save tokens to file
-    write_token(filename, athlete_id, strava_token)
-
-def get_token(filename: str, athlete_id: int) -> dict:
-    """
-    Retrieves the token information from a JSON file. If the token has expired,
-    it refreshes the token.
-
-    Args:
-        filename (str): Name of the JSON file containing token information.
-        athlete_id (int): ID of the athlete.
-
-    Returns:
-        dict: Dictionary containing token information.
-    """
-    if not os.path.exists(f'./{filename}.json'):
-        request_authorization(filename, athlete_id)
-        with open(f'{filename}.json', 'r') as token:
-            data = json.load(token)
-    else:
-        with open(f'{filename}.json', 'r') as token:
-            data = json.load(token)
-
-        if f"{athlete_id}" not in data or data[f"{athlete_id}"]['errors'][0]['code'] == "invalid":
-            request_authorization(filename, athlete_id)
-            #reopen the file after update
-            with open(f'{filename}.json', 'r') as token:
+    
+    new_token = response.json()
+    with open(tokenPath, 'r') as token:
                 data = json.load(token)
 
-    if data[f"{athlete_id}"]['expires_at'] < time.time():
-        print('Refreshing token!')
-        new_token = refresh_token(client_id, client_secret, data[f"{athlete_id}"]['refresh_token'])
-        strava_token = new_token.json()
-        # Update the file
-        write_token(filename, athlete_id, strava_token)
+    data = get_athlete_token(athlete_id)
 
-    with open(f'{filename}.json', 'r') as token:
-        data = json.load(token)
+    data['access_token'] = new_token['access_token']
+    data['expires_at'] = new_token['expires_at']
+    data['expires_in'] = new_token['expires_in']
+    data['refresh_token'] = new_token['refresh_token']
+    
+    write_token(data, tokenPath)
 
-    return data[f"{athlete_id}"]
+
+

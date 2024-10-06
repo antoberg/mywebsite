@@ -9,6 +9,7 @@
     --strava:#FC4C02;
     --skin-color:#4e7054;
     --header-text:#54515e;
+    --clickable-text:#007fb6;
 
 
     /* fonts */
@@ -35,6 +36,56 @@ body {
     position: relative;
     flex-wrap: wrap;
 }
+
+/* DEBUT SECTION ACCUEIL */
+
+.connect-box
+{
+    height: fit-content;
+    display: flex;
+    align-items: center;
+   
+  
+   
+}
+.connect-box p
+{
+    
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    justify-content: center;
+    
+}
+.connect-box img
+{
+    position: relative;
+    height: 40px;
+    border-radius: 10px;
+    margin: 10px;
+}
+.connect-box p
+{
+    height:100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    justify-content: center;
+}
+.connect-box span
+{
+    font-weight: bold;
+    font-size: 15px;
+}
+.connect-box a
+{
+    font-size: 15px;
+    color: var(--clickable-text);
+    text-decoration: none;
+}
+
+
+/* FIN SECTION ACCUEIL */
 
 
 
@@ -82,7 +133,8 @@ body {
     
     margin: 15px;
     color: var(--text-black-700);
-    max-width: 500px;
+    width: 1500px;
+    /* max-width: 1000px; */
 
     
     
@@ -115,8 +167,11 @@ body {
 {
     list-style-type:circle;
     
-
-    
+}
+.files-grid ul
+{
+height: 200px;
+overflow-y: auto;
 }
 
 .files-grid a .selected /* à gérer en js*/

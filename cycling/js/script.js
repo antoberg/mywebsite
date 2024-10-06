@@ -94,6 +94,9 @@ const nav = document.querySelector(".nav"),
               }
           }
       }
+
+      // ===================== NAVIGATION ENTRE LES FONCTIONS DEPUIS BOUTONS =========================
+
       document.querySelector(".hire-me").addEventListener("click", function()
       {
           const sectionIndex = this.getAttribute("data-section-index");

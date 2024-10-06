@@ -1,3 +1,5 @@
+# ====================== Importations ======================
+
 import gpxpy
 import folium
 from folium.plugins import AntPath,Fullscreen
@@ -6,12 +8,13 @@ import pandas as pd
 import os
 from datetime import datetime
 
-
 def get_current_timestamp():
     return (int(datetime.now().timestamp()))
 
+# ================== MANIPULATION GPX =================
+
 def read_gpx(fichier_gpx):
-    with open(fichier_gpx, 'r') as f:
+    with open(fichier_gpx, 'r',encoding='utf-8', errors='replace') as f: #Utf-8 important pour la lecture des emojis dans les titres strava
         gpx = gpxpy.parse(f)
 
     coords = []
@@ -48,11 +51,9 @@ def make_route_df(coords,ele):
     )
 
     return df
-            
 
-#%% calculs distance et temps
-#calcul de la distance et du temps écoulé
 def calc_travel_time(coords, speed):
+    #calcul de la distance et du temps écoulé
     #speed en m/s
     distance=[]#m
     time=[] #secs
@@ -60,14 +61,10 @@ def calc_travel_time(coords, speed):
     time.append(0)
     for i,p in enumerate(coords):
         if i>0:
-            
             dx = (calc_distance(coords[i-1][0],p[0],coords[i-1][1],p[1] ))
-    
             distance.append(distance[i-1]+dx)
             dt = (dx/speed)
             time.append(int(round(time[i-1]+dt)))
-            
-    
     df = pd.DataFrame(
         {
         "coords" : coords,
@@ -87,31 +84,31 @@ def calc_distance(laA,laB,loA,loB):
     
     return dist*1000 #m
 
-#%% création de la map
+# ========================== CREATION MAP FOLIUM =======================================           
+
 def create_map(coords):
     lats = [c[0] for c in coords]
     lons = [c[1] for c in coords]
     center_lat = (max(lats)+min(lats))/2
     center_lon = (max(lons)+min(lons))/2
-    
     m = folium.Map(location=[center_lat,center_lon],zoom_start=11)
-    
     Fullscreen(position='topright', title='Plein écran', titleCancel='Quitter plein écran').add_to(m)
-
     folium.Marker(coords[0],popup='start',icon=folium.Icon(icon='play',color='green')).add_to(m)
     folium.Marker(coords[len(coords)-1],popup='finish',icon=folium.Icon(icon='stop',color='red')).add_to(m)
-
-    #Indiquer le sens du parcours
+    #animation montrant le sens du parcours
     ant_path = AntPath(coords, color="blue", weight=5, opacity=0.7, dash_array=[10, 20],delay = 1000)
     ant_path.add_to(m)
-
     folium.PolyLine(coords,color='red',).add_to(m)
-    print('map created')
     return m
 
-#%% ajout de la météo à la map
-#Fonction d'orientation des vecteurs-vents
+def save_map(m, DIRECTORY : os.path):
+    ts = str(get_current_timestamp())
+    template_file_path = os.path.join(DIRECTORY, f'map_{ts}.html')
+    m.save(template_file_path)
+    return ts
+
 def get_bearing(p1,p2):
+    # calcul de l'orientation des vecteurs vent
     long_diff=np.radians(p2[1]-p1[1])
     lati1=np.radians(p1[0])
     lati2=np.radians(p2[0])
@@ -122,13 +119,9 @@ def get_bearing(p1,p2):
         return bearing + 360
     return bearing
 
-#construction des vecteurs vent à un pt précis
 def make_wind_vector(lat,lon,wind_speed, wind_dir, total_distance):
- 
-    
+    #construction des vecteurs vent à un point (lat, lon)
     norm_arrow=0.0001*total_distance/1000*wind_speed/3.6
-
-    print(wind_dir)
     if wind_dir<270:
         angle=np.radians(270-wind_dir)
     else:
@@ -142,6 +135,7 @@ def make_wind_vector(lat,lon,wind_speed, wind_dir, total_distance):
     return A,B, orientation
 
 from scripts.weather_script import get_forecast, get_date_timestamp
+# ========================== WEATHER → MAP =======================================
 
 def get_weather(coords, date_string ,bike_speed):
     #exemple date_str="25/09/2024 19:50:00" #speed m/s
@@ -188,7 +182,6 @@ def get_weather(coords, date_string ,bike_speed):
 
     return df
     
-
 def add_wind_vectors_to_map(df_weather, m):
     total_distance = max(df_weather['distance'])
     print(str(total_distance/1000)+'kms')
@@ -199,50 +192,30 @@ def add_wind_vectors_to_map(df_weather, m):
         folium.RegularPolygonMarker(B,fill_opacity=100,opacity=100,fill_color='black',color='black',number_of_sides=3,radius=10,rotation=orientation,popup='speed : '+str(round(df_weather['wind_speed'][i]*3.6))+' km/h').add_to(m)
 
     return m
-def save_map(m):
-    
-    ts = str(get_current_timestamp())
-    # Construire le chemin vers le fichier dans 'tools/templates'
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    template_file_path = os.path.join(current_dir, '../static/maps/map'+ts+'.html')
-    m.save(template_file_path)
-    print('map saved')
-    return ts
 
-#%% FONCTION GLOBALE
+#==========================  COORDINATION DES FONCTIONS ===================================
 
-def make_map(filepath, date_str, speed):
-    
-    print(date_str)
+def make_map(filepath, date_str, speed, DIRECTORY : os.path):
     coords, ele = read_gpx(filepath)
     df_route= make_route_df(coords, ele)
-    
-    #création de la map
     coords = df_route['coords']
     m = create_map(coords)
     if date_str != 'nan':
-        #récupération de la météo
         df_weather = get_weather(coords, date_str, speed)
-        print(df_weather)
-        #ajout des vecteurs vent
         m = add_wind_vectors_to_map(df_weather, m)
+
     else:
         df_weather = pd.DataFrame({
             'distance':[],
             'wind_speed':[],
             'temp':[],
             'rain':[]
-
         })
-
-    #sauvegarde de la map dans un fichier
     
-    return save_map(m), df_route, df_weather
+    return save_map(m, DIRECTORY), df_route, df_weather
     
-        
-        
+# ========================== DEBUG ===============================================
 
-#%% DEBUG
 # current_dir = os.path.dirname(os.path.abspath(__file__))
 # exemple_gpx_file = os.path.join(current_dir, '../gpx_files/Rome.gpx')
 # make_map(filepath=exemple_gpx_file, date_str='25/09/2024 19:50:00', speed=30/3.6)

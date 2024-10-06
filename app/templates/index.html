@@ -6,7 +6,7 @@
     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index_style.css') }}?v={{ time }}">
     
-    <link rel="icon" href= "{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
+    <link rel="icon" href= "{{ url_for('static', filename='images/home_logo_bg.jpg') }}" type="image/jpg">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
 </head>
@@ -44,57 +44,70 @@
             <header>
                 <title>Accueil</title>
             </header>
-            
             <div class="row">
-                 <p>Cette page ne contient pas encore de contenu.</p>
-            </div>
-            
+                <div class="connect-box">
+                    <img src="{{ url_for('static', filename='images/strava.png') }}">
+                    <p>
+                        <span>{{strava_connect_status}}</span>
+                        <a href="/strava-connect-btn">{{connect_btn}}</a>
+                        
+                    </p>  
+                </div>
+                <div>
+                    <a href="#map" class="get-map">Get Map</a>
+                </div>
+            </div> 
         </section>
         
         <!--DEBUT SECTION CARTE-->
         <section class="map section hidden" id="map">
             <header>
-               
                 <h2 class="section-title">GPXplorer</h2>
             </header>
-
-            
-            <form action="/submit" method="POST" enctype="multipart/form-data">
                 <div class="row">
-
                         <div class="step file">
                             <img src="{{ url_for('static', filename='images/document.png') }}" class="file icon">
                             <h2>Select file</h2>
                             <hr>
-                            <div class="files-grid">
+                            <div class="files-grid" id="files-grid">
                                 
                                 <div>
                                     <h3>Recent</h3>
                                     
-
-                                    {% for file in recent_files %}
-                                        <li><a href="#" class="file-link" data-filename="{{ file }}">{{ file }}</a></li>
-                                    {% endfor %}
-                                    
+                                    <ul class="files-list">
+                                        {% for file in recent_files %}
+                                            <li><a href="#" class="file-link" data-filename="{{ file }}">{{ file }}</a></li>
+                                        {% endfor %}
+                                    </ul>
                                     
                                 </div>
-                                <div>
+                                <div class="files-list">
                                     <h3>Races</h3>
-                                    {% for file in race_files %}
-                                        <li><a href="#" class="file-link" data-filename="{{ file }}">{{ file }}</a></li>
-                                    {% endfor %}
+                                    <ul>
+                                        {% for file in race_files %}
+                                            <li><a href="#" class="file-link" data-filename="{{ file }}">{{ file }}</a></li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
-
-                                
-                                
+                                <div >
+                                    <h3>Import from Strava</h3>
+                                    <form action="/import-strava-routes" method="POST">
+                                        <button type="submit" id="load-strava-routes">Load</button>
+                                    </form>
+                                    <i id="loading"></i>
+                                    <ul class="files-list" id="strava-files-list">
+                                        <!-- <li><a href="#" class="file-link" data-filename="test">test</a></li> -->
+                                    </ul>
+                                </div>  
                             </div>
-                            <input type="hidden" id="selectedFilename" name="filename">
+
+                            <input type="hidden" id="selectedFilename" name="filename" form="paramsForm">
+                            <input type="hidden" id="fileSource" name="fileSource" form="paramsForm">
+                            <input type="hidden" id="fileId" name="fileId" form="paramsForm">
                             
-                            <h3>Import new</h3>
-                            <div class="linput"><li><input type="file" id="gpxFile" name="gpxFile" accept=".gpx"></li></div>
-                            
-                                
-                               
+                            <h3>Import .gpx file</h3>
+                            <div class="linput"><li><input type="file" id="gpxFile" name="gpxFile" accept=".gpx" form = "paramsForm"></li></div>
+
                             <div class="status">
                                 <img id="filestatuspic" src="{{ url_for('static', filename='images/caution.png') }}" class="status-icon">
                                 <span class="status-text" id="filestatus">No file selected </span>
@@ -106,18 +119,20 @@
                             
                             <h2>Set parameters <i>(optional)</i></h2>
                             <hr>
-                            <div class="params-list">
-                                <li><label for="date"><h3>Select date</h3></label></li>
-                                <li> <input type="date" id="date" name="date"></li>
-                                
-                                <li><label for="time"><h3>Select time</h3></label></li>
-                                <li><input type="time" id="time" name="time"></li>
-                                
-                                <li><label for="speed"><h3>Select est. speed</h3></label></li>
-                                <li><input type="number" id="speed" name="speed" min="10" max="60" value="30" step = "1" ><span>km/h</span></li>
-                                
-                                
-                            </div>
+                            <form action="/submit" method="POST" enctype="multipart/form-data" id="paramsForm">
+                                <div class="params-list">
+                                    <li><label for="date"><h3>Select date</h3></label></li>
+                                    <li> <input type="date" id="date" name="date"></li>
+                                    
+                                    <li><label for="time"><h3>Select time</h3></label></li>
+                                    <li><input type="time" id="time" name="time"></li>
+                                    
+                                    <li><label for="speed"><h3>Select est. speed</h3></label></li>
+                                    <li><input type="number" id="speed" name="speed" min="10" max="60" value="30" step = "1" ><span>km/h</span></li>
+                                    
+                                    
+                                </div>
+                            </form>
 
                             <div class="status">
                                 <img src="{{ url_for('static', filename='images/caution.png') }}" class="status-icon">
@@ -127,10 +142,8 @@
                         </div>
                 </div>
                 <div class="sub-btn-container">
-                    <button type="submit" class="btn">Load dashboard</button>
+                    <button type="submit" class="btn" form="paramsForm">Load dashboard</button>
                 </div>
-            </form>
-
         </section>
     </div>
 
@@ -144,52 +157,10 @@
 
     </footer>
     
-    <script src="{{ url_for('static', filename='js/index_script.js') }}?v={{ time }}"></script>
     <script>
-        // Variable pour stocker le nom du fichier sélectionné
-        let selectedFilename = '';
-
-        // Récupérer tous les liens des fichiers
-        const fileLinks = document.querySelectorAll('.file-link');
-        
-   
-        fileLinks.forEach(link => {
-            link.addEventListener('click', function(event) {
-               
-                event.preventDefault();  // Empêche le lien d'ouvrir une nouvelle page
-                selectedFilename = this.getAttribute('data-filename');  // Stocke le nom du fichier
-                document.getElementById('filestatus').textContent = selectedFilename+" selected";  // Affiche le nom du fichier sélectionné
-                document.getElementById('filestatuspic').src = "{{ url_for('static', filename='images/check.png') }}";
-                document.getElementById('selectedFilename').value = selectedFilename;
-            });
-        });
-
-        let file = '';
-
-        // récupérer nom fichier importé
-        const importedFile = document.getElementById('gpxFile');
-
-        importedFile.addEventListener('change', function() {
-            console.log("Change event triggered");
-
-            // Récupérer le fichier sélectionné
-            file = this.files[0];
-            
-            // Vérifier si un fichier a été sélectionné
-            if (file) {
-                fileName = file.name;  // Récupérer le nom du fichier
-                document.getElementById('filestatus').textContent = fileName + " sélectionné";
-                
-                // Modifier l'image de statut
-                document.getElementById('filestatuspic').src = "{{ url_for('static', filename='images/check.png') }}";
-            } else {
-                document.getElementById('filestatus').textContent = "Aucun fichier sélectionné";
-                document.getElementById('filestatuspic').src = "";  // Réinitialiser l'image si aucun fichier
-            }
-        });
-        
-
-        
+        const checkIconUrl = "{{ url_for('static', filename='images/check.png') }}";
     </script>
+    <script src="{{ url_for('static', filename='js/index_script.js') }}?v={{ time }}"></script>
+    
 </body>
 </html>

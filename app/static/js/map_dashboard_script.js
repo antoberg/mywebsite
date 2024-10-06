@@ -73,6 +73,7 @@ let chart0 = new Chart(ctx0, {
             },
             y: 
             { 
+                beginAtZero: true,
                 grid:{display:false},
                 title: { display: true, text: 'Précipitations (mm)' } 
             }
@@ -152,6 +153,7 @@ let chart2 = new Chart(ctx2, {
             },
             y: 
             { 
+                beginAtZero: true,
                 grid:{display:false},
                 title: { display: true, text: 'Température (°C)' } 
             }
