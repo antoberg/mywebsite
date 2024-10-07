@@ -8,7 +8,7 @@
     
     <link rel="icon" href= "{{ url_for('static', filename='images/home_logo_bg.jpg') }}" type="image/jpg">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
+    <title>{{title}}</title>
 </head>
 
 <body>
@@ -23,56 +23,76 @@
         <div class="nav-toggler">
             <span></span>
         </div>
+        <!-- Home -->
         <div class="dropdown">
-            <li><span class="nav-column active"><a href="#home" class="active">ACCUEIL</a></span></li>
+            <li><span class="nav-column {{section1}}"><a href="/home" class="{{section1}}" >Accueil</a></span></li>
         </div>
+        <!-- GPXplorer -->
         <div class="dropdown">
-            <button class="dropbtn">
-                <span class="nav-column"><a>OUTILS</a></span>
-                <i class="fa fa-caret-down"></i>
-            </button>
-            <div class="dropdown-content">
-                <li><a href="#map">GPXplorer</a></li>
+            <li><span class="nav-column {{section2}} "><a href="/gpxplorer" class="{{section2}}" >GPXplorer</a></span></li>
+        </div>
+        <!-- Events -->
+        <div class="dropdown">
+            <li><span class="nav-column {{section3}}"><a href="/events" class="{{section3}}">Evènements</a></span></li>
+        </div>
+        <div class="account">
+        
+                <!-- Login -->
+            <div class="dropdown {{status}}" id="connect-drop">
+                <li><span class="nav-column"><a href="/strava-connect-btn" class="strava-connect-btn">Se connecter</a></span></li>
+            </div>
+            <!-- Menu mon compte -->
+            <div class="dropdown {{status}}" id="account-drop">
+                <button class="dropbtn">
+                    <span class="nav-column {{section4}}"><a>{{username}}</a></span>
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <li><a href="/settings" class="{{section4}}">Paramètres</a></li>
+                    <li><a href="/strava-connect-btn" class="strava-connect-btn">Déconnexion</a></li>
+                </div>
             </div>
         </div>
+        
     </div>
 
     <div class="main-content">
         <!--DEBUT SECTION ACCUEIL-->
-        <section class="home section active" id="home">
+        <section class="home section {{section1}}" id="home">
             
             <header>
-                <title>Accueil</title>
+                <!-- <title>Accueil</title> -->
             </header>
             <div class="row">
                 <div class="connect-box">
                     <img src="{{ url_for('static', filename='images/strava.png') }}">
                     <p>
                         <span>{{strava_connect_status}}</span>
-                        <a href="/strava-connect-btn">{{connect_btn}}</a>
-                        
+                        <a href="/strava-connect-btn" class="strava-connect-btn">{{connect_btn}}</a>
                     </p>  
                 </div>
                 <div>
-                    <a href="#map" class="get-map">Get Map</a>
+                    
                 </div>
             </div> 
         </section>
         
         <!--DEBUT SECTION CARTE-->
-        <section class="map section hidden" id="map">
+        <section class="map section {{section2}}" id="map">
             <header>
+                <!-- <title>GPXplorer</title> -->
                 <h2 class="section-title">GPXplorer</h2>
             </header>
                 <div class="row">
                         <div class="step file">
+                          
                             <img src="{{ url_for('static', filename='images/document.png') }}" class="file icon">
-                            <h2>Select file</h2>
+                            <h2>Parcours</h2>
                             <hr>
                             <div class="files-grid" id="files-grid">
                                 
                                 <div>
-                                    <h3>Recent</h3>
+                                    <h3>Mes parcours</h3>
                                     
                                     <ul class="files-list">
                                         {% for file in recent_files %}
@@ -82,7 +102,7 @@
                                     
                                 </div>
                                 <div class="files-list">
-                                    <h3>Races</h3>
+                                    <h3>Evènements</h3>
                                     <ul>
                                         {% for file in race_files %}
                                             <li><a href="#" class="file-link" data-filename="{{ file }}">{{ file }}</a></li>
@@ -90,9 +110,9 @@
                                     </ul>
                                 </div>
                                 <div >
-                                    <h3>Import from Strava</h3>
+                                    <h3>Mes parcours Strava</h3>
                                     <form action="/import-strava-routes" method="POST">
-                                        <button type="submit" id="load-strava-routes">Load</button>
+                                        <button type="submit" id="load-strava-routes">Charger</button>
                                     </form>
                                     <i id="loading"></i>
                                     <ul class="files-list" id="strava-files-list">
@@ -105,29 +125,29 @@
                             <input type="hidden" id="fileSource" name="fileSource" form="paramsForm">
                             <input type="hidden" id="fileId" name="fileId" form="paramsForm">
                             
-                            <h3>Import .gpx file</h3>
+                            <h3>Importer un .gpx</h3>
                             <div class="linput"><li><input type="file" id="gpxFile" name="gpxFile" accept=".gpx" form = "paramsForm"></li></div>
 
                             <div class="status">
                                 <img id="filestatuspic" src="{{ url_for('static', filename='images/caution.png') }}" class="status-icon">
-                                <span class="status-text" id="filestatus">No file selected </span>
+                                <span class="status-text" id="filestatus">Pas de fichier sélectionné </span>
                             </div>
 
                         </div>
                         <div class="step params">
                             <img src="{{ url_for('static', filename='images/settings.png') }}" class="settings icon">
                             
-                            <h2>Set parameters <i>(optional)</i></h2>
+                            <h2>Paramètres <i>(facultatif)</i></h2>
                             <hr>
                             <form action="/submit" method="POST" enctype="multipart/form-data" id="paramsForm">
                                 <div class="params-list">
-                                    <li><label for="date"><h3>Select date</h3></label></li>
+                                    <li><label for="date"><h3>Date de départ</h3></label></li>
                                     <li> <input type="date" id="date" name="date"></li>
                                     
-                                    <li><label for="time"><h3>Select time</h3></label></li>
+                                    <li><label for="time"><h3>Heure</h3></label></li>
                                     <li><input type="time" id="time" name="time"></li>
                                     
-                                    <li><label for="speed"><h3>Select est. speed</h3></label></li>
+                                    <li><label for="speed"><h3>Vitesse estimée</h3></label></li>
                                     <li><input type="number" id="speed" name="speed" min="10" max="60" value="30" step = "1" ><span>km/h</span></li>
                                     
                                     
@@ -135,16 +155,40 @@
                             </form>
 
                             <div class="status">
-                                <img src="{{ url_for('static', filename='images/caution.png') }}" class="status-icon">
-                                <span class="status-text">Parameters set</span>
+                                <img class="status-icon" id="paramStatuspic">
+                                <span class="status-text" id="paramStatus">Date vide, la météo ne sera pas calculée</span>
                             </div>
 
                         </div>
                 </div>
                 <div class="sub-btn-container">
-                    <button type="submit" class="btn" form="paramsForm">Load dashboard</button>
+                    <button type="submit" class="btn" form="paramsForm">Charger le dashboard</button>
                 </div>
         </section>
+
+        <!--DEBUT SECTION EVENT-->
+        <section class="event section {{section3}}" id="events">
+            
+            <header>
+                <!-- <title>Evènement</title> -->
+            </header>
+            <div class="row">
+            </div> 
+        </section>
+
+
+        <!--DEBUT SECTION SETTING-->
+        <section class="settings section {{section4}}" id="settings">
+            
+            <header>
+                <!-- <title>Paramètres</title> -->
+            </header>
+            <div class="row">
+            </div> 
+        </section>
+
+
+
     </div>
 
     <footer>
@@ -159,7 +203,10 @@
     
     <script>
         const checkIconUrl = "{{ url_for('static', filename='images/check.png') }}";
+        const cautionIconUrl = "{{ url_for('static', filename='images/caution.png') }}";
+        
     </script>
+
     <script src="{{ url_for('static', filename='js/index_script.js') }}?v={{ time }}"></script>
     
 </body>

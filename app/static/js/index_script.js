@@ -1,12 +1,10 @@
-// ===================== NAVIGATION ENTRE LES SECTIONS =========================
+// ===================== afficher le toggler (trouver une alternative ?) =========================
 
 const nav = document.querySelector(".navbar"),
-      
     dropList = nav.querySelectorAll(".dropdown") 
     totalDropList = dropList.length,
     allSection = document.querySelectorAll(".section"),
     totalSection = allSection.length;
-    
     //   on parcours les dropdons (columns)
     for(let k=0; k<totalDropList; k++)
     {
@@ -16,56 +14,18 @@ const nav = document.querySelector(".navbar"),
         for(let i=0; i<totalNavList; i++)
         {
             const a = navList[i].querySelector("a");
-            a.addEventListener("click", function()
+            a.addEventListener("click", function(event)
             {
-                
-                showSection(this);
                 if(window.innerWidth < 1200)
                 {
-                    asideSectionTogglerBtn();
+                    asideSectionTogglerBtn(); //affiche le toggler si la fenetre est petite
                 }
                 
             })
         }
     }
-    // Update la section visible 
-    function showSection(element)
-    {
-        for(let i=0; i<totalSection; i++)// PARCOURS DES .DROPDOWNS
-        {
-            //=============UPDATE DE LA BARRE DE NAV================
-            dropCol = dropList[i].querySelector("span")
-            //on désactive les elemnts span : têtes de colonnes
-            dropCol.classList.remove("active");
-            
-            navList = dropList[i].querySelectorAll("li")
-            totalNavList = navList.length
-            for(let j=0; j<totalNavList; j++) // PARCOURS DES ITEMS DU DROPDOWN (li)
-            {
-                navElem = navList[j].querySelector("a") //le <a> de chaque <li> de la droplist
-                navElem.classList.remove("active");
-                if(navElem.getAttribute('href').split("#")[1] == element.getAttribute("href").split("#")[1])
-                {
-                    dropCol.classList.add("active");
-                    navElem.classList.add("active");
-                    
-                    // mettre à jour le title pour le nom de l'onglet
-                    document.title = navElem.textContent
-                }
-            }
-
-            //=============UPDATE DES SECTIONS (utilise les class .active de la barre de nav)================
-            allSection[i].classList.remove("active");
-            allSection[i].classList.add("hidden");
-        }
-        // active les sections qui ont comme class le href du element = le href du a de la navbar
-        const target = element.getAttribute("href").split("#")[1];
-        document.querySelector("#" + target).classList.add("active")
-        document.querySelector("#" + target).classList.remove("hidden")
-    }
    
-    
-    // Utilisation Navbar
+    // SIDE BAR
     const navTogglerBtn = document.querySelector(".nav-toggler"),
         aside = document.querySelector(".navbar");
         navTogglerBtn.addEventListener("click", () => 
@@ -81,12 +41,6 @@ const nav = document.querySelector(".navbar"),
                 allSection[i].classList.toggle("open");
             }
         }
-// ===================== ACTIVER / MASQUER LES SECTIONS DEPUIS UN BOUTON =========================
-    
-    document.querySelector(".get-map").addEventListener("click", function()
-        {
-            showSection(this);
-        })
 
 
 // ===================== FICHIERS GPX LOCAUX ET STRAVA: MESSAGE DE STATUS & STOCKAGE FILENAME DANS FORM =========================
@@ -99,28 +53,28 @@ const filelistContainers = document.querySelectorAll('.files-list')
 
 filelistContainers.forEach(file =>{
     file.addEventListener('click', function(event){
+    
     event.preventDefault();
-        console.log("list found")
-        if (event.target.classList.contains('file-link')) {
-            // Empêche le lien d'ouvrir une nouvelle page
-            selectedFilename = event.target.getAttribute('data-filename');  // Stocke le nom du fichier
-            selectedId = event.target.id;  // Stocke l'ID du fichier (pour les routes strava)
+    
+    if (event.target.classList.contains('file-link')) {
+        // Empêche le lien d'ouvrir une nouvelle page
+        selectedFilename = event.target.getAttribute('data-filename');  // Stocke le nom du fichier
+        selectedId = event.target.id;  // Stocke l'ID du fichier (pour les routes strava)
+        document.getElementById('filestatus').textContent = "Parcours sélectionné : "+selectedFilename.split('.')[0];  // Affiche le nom du fichier sélectionné
+        document.getElementById('filestatuspic').src = checkIconUrl;
 
-            document.getElementById('filestatus').textContent = selectedFilename + " selected";  // Affiche le nom du fichier sélectionné
-            document.getElementById('filestatuspic').src = checkIconUrl;
-
-            document.getElementById('selectedFilename').value = selectedFilename;
-            if (file.id  == "strava-files-list" ){
-                document.getElementById('fileSource').value = "strava";
-                document.getElementById('fileId').value = selectedId;
-            }else{
-                document.getElementById('fileSource').value = "server";
-            }
+        document.getElementById('selectedFilename').value = selectedFilename;
+        if (file.id  == "strava-files-list" ){
+            document.getElementById('fileSource').value = "strava";
+            document.getElementById('fileId').value = selectedId;
+        }else{
+            document.getElementById('fileSource').value = "server";
+        }
         }
     });
 });
 
-// ===================== IMPORT FICHIERS GPX UTILISATEUR : MESSAGE DE STATUS =========================
+// ===================== ENTREES USER - MESSAGE DE STATUS =========================
 let file = '';
 
 // récupérer nom fichier importé
@@ -137,21 +91,75 @@ importedFile.addEventListener('change', function() {
     if (file) {
         fileName = file.name;  // Récupérer le nom du fichier
         document.getElementById('filestatus').textContent = fileName + " sélectionné";
-        
-        
         // Modifier l'image de statut
-        document.getElementById('filestatuspic').src = "{{ url_for('static', filename='images/check.png') }}";
+        document.getElementById('filestatuspic').src = checkIconUrl;
     } else {
         document.getElementById('filestatus').textContent = "Aucun fichier sélectionné";
         document.getElementById('filestatuspic').src = "";  // Réinitialiser l'image si aucun fichier
     }
 });
 
+// récupérer paramètres importés
+const paramsForm = document.getElementById('paramsForm');
+
+// Update message status
+paramsForm.addEventListener('change', function() {
+
+    const currentDate = new Date();
+    const timeLim = 7*24*3600*1000; //millisec
+
+    iconUrl = cautionIconUrl
+
+    
+    
+    // Récupérer le fichier sélectionné
+    dateInput = document.getElementById('date').value;
+    timeInput = document.getElementById('time').value;
+    console.log("date",dateInput,"time",timeInput);
+
+    if ((dateInput == '') || (timeInput == '')) {
+        console.log('1 champs remplis');
+        if (timeInput == ''){
+            params_message = "Heure vide, la météo ne sera pas calculée"
+        }else{
+            params_message = "Date vide, la météo ne sera pas calculée"
+        }
+    }else if ((dateInput !== '') && (timeInput !== '')){
+        console.log('2 champs remplis');
+        const paramsDate = new Date(dateInput+'T'+timeInput+':00');
+        if (paramsDate < currentDate) {
+            console.log('date dans le passé');
+            params_message = "Date passée"
+        }else if (paramsDate - currentDate > timeLim ){
+            params_message = "Date trop éloignée (limite : 7j)"
+            
+        }else{
+            params_message = ""
+            iconUrl = checkIconUrl
+        }
+    }
+    
+    document.getElementById('paramStatus').textContent = params_message;
+    document.getElementById('paramStatuspic').src = iconUrl;
+});
+
+// ===================== CONNECTION A STRAVA ROUTES STRAVA  =========================
+// Récupère tous les éléments avec la classe "strava-connect-btn"
+var connectButtons = document.getElementsByClassName("strava-connect-btn");
+
+// Boucle à travers chaque élément et ajoute l'event listener
+for (var i = 0; i < connectButtons.length; i++) {
+    connectButtons[i].addEventListener("click", function(event) {
+        event.preventDefault(); // Empêche le changement de page par défaut
+        
+    });
+}
 // ===================== IMPORT ROUTES STRAVA  =========================
 
 // --------------- Affichage de la liste des routes depuis réponse JSON-------------
 
 document.getElementById("load-strava-routes").addEventListener("click", function(event) {
+    
 
     event.preventDefault(); // blocage du chgt de page par défaut quand l'user click sur load
     let loadStr = document.getElementById("loading");
@@ -162,6 +170,7 @@ document.getElementById("load-strava-routes").addEventListener("click", function
     })
     .then(response => response.json())  // Convertir la réponse en JSON
     .then(data => {
+        
         console.log("Données reçues:", data);
         // Cibler l'élément où les fichiers doivent être affichés
         let fileList = document.getElementById("strava-files-list");

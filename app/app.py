@@ -1,6 +1,6 @@
 # ====================== Importations ======================
 
-from flask import Flask, render_template, request, jsonify, redirect, session
+from flask import Flask, render_template, request, jsonify, redirect, session, url_for
 import numpy as np
 import scripts.startlist_script as ss
 import scripts.map_script as ms
@@ -30,14 +30,27 @@ tokenPath = os.path.join(TOKENS_FILES_DIRECTORY, 'strava_token.json')
 recent_files = os.listdir(os.path.join(GPX_FILES_DIRECTORY, 'recent'))
 race_files = os.listdir(os.path.join(GPX_FILES_DIRECTORY, 'races'))
 
-## variables
+## constantes
 current_time = int(time.time())
 strava_connect_status0 = "No connected athlete"
 strava_connect_status1 = 'Connected as {}'
 connect_btn0 = 'Connect'
 connect_btn1 = 'Disconnect'
+sections = ['home', 'gpxplorer', 'events', 'settings']
 
 # ====================== Fonctions ===========================
+def toggle_sections(section : str):
+    '''
+    renvoit une liste de strings utilisés pour render les template 
+    et gérer l'affichage des sections en CSS
+    '''
+    result = []
+    for s in sections:
+        if s == section:
+            result.append("active")
+        else:
+            result.append('hidden')
+    return result
 
 def open_map(filepath, time_str,speed,name,weather_request):
     ts, df_route, df_weather = ms.make_map(filepath,time_str,speed,DIRECTORY=MAPS_FILES_DIRECTORY)
@@ -53,6 +66,7 @@ def open_map(filepath, time_str,speed,name,weather_request):
     
     map_filepath = os.path.join(MAPS_FILES_DIRECTORY, f'map_{ts}.html')
     map_filepath = f'map_dashboard_files/folium_maps/map_{ts}.html'
+
     return render_template('map_dashboard.html', time = current_time, map_url=map_filepath, 
                            title= name, dist=total_dist, asc=asc,desc=desc, x_data = dist_list, y_data = ele_list,
                            weather_request=weather_request,#=active si la météo est requise par le user
@@ -60,32 +74,56 @@ def open_map(filepath, time_str,speed,name,weather_request):
 
 # ====================== Routes Flask ===========================
 app = Flask(__name__)
+#session : 'username' , 'user_id'
 
+#regroupement du render template pour éviter les répétitions dans les fonctions
+def render_index(connect_status : str, section : str):
 
-@app.route('/')
-def index():
-    # session.clear()
+    if connect_status == 'in':
+        username = session['username']
+        strava_connect_status = strava_connect_status1.format(username)
+        connect_btn = connect_btn1
     
-    if not 'athlete_id' in session:
+    else:
+        username = ''
         strava_connect_status = strava_connect_status0
         connect_btn = connect_btn0
-        
 
+    if section =='':
+        section ='home'
+    
+    section1,section2,section3,section4 =toggle_sections(section)
+    
+    return render_template('index.html', title=section,
+                            status = connect_status, username = username, #---------> session en cours
+                            connect_btn = connect_btn, strava_connect_status=strava_connect_status, #------>status de la connexion
+                            section1=section1,section2=section2,section3=section3,section4=section4, #------> section à activer
+                            time = current_time, race_files=race_files,recent_files=recent_files #-----> section MAP
+                            )
+
+
+@app.route('/')#redirect du nom de domaine
+def redirect_to_home():
+        return redirect(url_for('index', var = 'home'), 301)
+
+@app.route('/<var>') #redirect les sections de l'index
+def index(var):
+    if var in sections:
+        if not 'athlete_id' in session:
+            status = 'out'
+
+        else:
+            status = 'in'
+            scon.check_token_validity(session['athlete_id'], tokenPath)##refresh le token si besoin
+
+        return render_index(connect_status = status, section = var )
 
     else:
-        
-        scon.check_token_validity(session['athlete_id'], tokenPath)##refresh le token si besoin
-        strava_connect_status = strava_connect_status1.format(session['username'])
-        connect_btn = connect_btn1
-        
-  
-    return render_template('index.html', time = current_time, 
-                           race_files=race_files,recent_files=recent_files,
-                           strava_connect_status=strava_connect_status,
-                           connect_btn = connect_btn)
+        return render_template('my404.html  ')
 
 # ======================== début connexion strava =====================================
-#   
+
+
 @app.route('/strava-connect-btn')
 def strava_connect():
     if not 'athlete_id' in session:
@@ -96,18 +134,17 @@ def strava_connect():
         return redirect(request_url)
  
     else:
-
-        athId = session['athlete_id']
-        session.pop('athlete_id', athId)
-
+        session.pop('athlete_id')
+        session.pop('username')
+        status = 'out'
         strava_connect_status = strava_connect_status0
         connect_btn = connect_btn0
-        
-
         return render_template('index.html', time = current_time, 
+                                username='',status=status,
                             race_files=race_files,recent_files=recent_files,
                             strava_connect_status=strava_connect_status,
                             connect_btn = connect_btn)
+
 
 @app.route('/strava_redirect')
 def strava_redirect():
@@ -124,14 +161,17 @@ def strava_redirect():
     
 
     scon.check_token_validity(session['athlete_id'], tokenPath)##refresh le token si besoin
+    status='in'
     
     return render_template('index.html', time = current_time, 
+                           username=session['username'],status=status,
                         race_files=race_files,recent_files=recent_files,
                         strava_connect_status=strava_connect_status,
                         connect_btn = connect_btn)
 
     
 #================ fin connexion strava ====================
+
 
 @app.route('/import-strava-routes', methods=['POST'])
 def ma_route():
@@ -144,7 +184,7 @@ def ma_route():
 @app.route('/submit' , methods=['POST'])
 def submit_form():
     fileSource = request.form.get('fileSource')
-    weather_request = 'hidden' #par défaut
+    weather_request = 'hidden' #par défaut  
     
     if not request.form['date']:
         time_string='nan'

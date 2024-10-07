@@ -80,23 +80,28 @@ def check_token_validity(athlete_id: int, tokenPath : os.path):
     """
     
     access = False
-    if os.path.exists(tokenPath):
+    if os.path.exists(tokenPath): #------>existence du fichier ? (quasi garanti)
         with open(tokenPath, 'r') as token:
             data = json.load(token)
-        if f"{athlete_id}" in data:
-            athlete = data[f"{athlete_id}"]
-            if 'errors' in athlete:
-                access_string = "access token erroné dans le json"
-            else:
-                username = athlete['athlete']['username']
-                if athlete['expires_at'] < time.time():
-                    refresh_token(client_id, client_secret, athlete['refresh_token'], athlete_id)
-                    access_string = f'{username} connecté - access token refreshed car il était expiré'
+
+        access_string = "athlete id absent du json"
+        for ath in data: #------> ID présent ?
+            if f"{athlete_id}" in ath: 
+                athlete = ath[f"{athlete_id}"]
+                if 'errors' in athlete: #------> erreurs ?
+                    access_string = "access token erroné dans le json"
                 else:
-                    access_string = f'{username} connecté avec succès'
-                    access = True
-        else:
-            access_string = "athlete id absent du json"
+                    username = athlete['athlete']['username']
+                    if athlete['expires_at'] < time.time(): #------> token expiré ?
+                        refresh_token(client_id, client_secret, athlete['refresh_token'], athlete_id)
+                        access_string = f'{username} connecté - access token refreshed car il était expiré'
+                    else:
+                        access_string = f'{username} connecté avec succès'
+                        access = True
+            break
+                
+
+
     else:
         access_string = "strava_token.json inexistant"
 
