@@ -189,7 +189,7 @@ de l'index ou erreur 404 si section page inexistante
         return render_index(connect_status = status, section = var )
 
     else:
-        return render_template('my404.html  ')
+        return render_template('my404.html')
 
 # ======================== CONNEXION API STRAVA =====================================
 
