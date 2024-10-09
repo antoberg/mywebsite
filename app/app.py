@@ -57,6 +57,8 @@ def toggle_sections(section : str):
 def render_dashboard(gpx_path  : os.path, time_str : str, speed : int , title : str):
 
     ts, df_route, df_weather = ms.make_map(gpx_path,time_str,speed,MAPS_FILES_DIRECTORY=MAPS_FILES_DIRECTORY_TEMP)
+    print('time________', ts)
+    print('time_str________', ts)
 
     if time_str: #vérifie si la météo est demandée
         weather_request = '' # sert à cacher ou afficher la section météo dans le dashboard
@@ -256,16 +258,19 @@ def ma_route():
 
 @app.route('/load-dashboard', methods=['POST']) #lancement du dashboard
 def submit_form():
+
+    
     
     fileSource = request.form.get('fileSource')
-    
+
     status = 'user_id' in session #renvoit vrai si l'utilisateur est connecté
     if status:
         df_routes = pd.read_csv(os.path.join(DATA_DIRECTORY, 'routes.csv'))
       
-        
+
     #METEO
-    if not request.form['date'] or not request.form['time'] : #si la météo n'est pas demandée
+    #si la météo n'est pas demandée OU le form non valide
+    if not request.form['date'] or not request.form['time'] or request.form.get('validForm') != 'valid' : 
         time_string = None
     else:
         time_string = request.form['date']+' '+request.form['time']+':00'

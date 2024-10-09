@@ -140,11 +140,14 @@ paramsForm.addEventListener('change', function() {
         }else{
             params_message = ""
             iconUrl = checkIconUrl
+            document.getElementById('validForm').value = 'valid';
         }
     }
     
     document.getElementById('paramStatus').textContent = params_message;
     document.getElementById('paramStatuspic').src = iconUrl;
+    
+
 });
 
 // ===================== CONNECTION A STRAVA ROUTES STRAVA  =========================
