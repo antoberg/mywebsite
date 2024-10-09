@@ -1,2 +1,3 @@
 user_id,athlete_id,access_token,refresh_token,expires_at,firstname,lastname,profile_medium
 7270139,7270139,59d81769958a8d42633378b2cb564beb6abd15dd,c42ccac73d02f05f4141262a2ce02bfafbd2e8bd,1728507712,Antoine,Berger,https://dgalywyr863hv.cloudfront.net/pictures/athletes/7270139/2792894/38/medium.jpg
+149559913,149559913,0dd092f4168f875eecff2878d8e1fc0d4f6fac54,0dd8b8934ba33ef4cefdb71e14a9458137994eda,1728521132,Beta,Testeur,avatar/athlete/medium.png

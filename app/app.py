@@ -13,6 +13,7 @@ import os
 import pandas as pd
 import data.initiate_db as db
 import glob
+import random
 # ================== Constantes et Variables =================
 
 # ---- ROOT DIRECTORY DATA
@@ -70,8 +71,7 @@ def render_dashboard(gpx_path  : os.path, time_str : str, speed : int , title : 
     ele_list = [round(x) for x in df_route['elevation']]
     wind_data = [round(x*3.6) for x in df_weather['wind_speed']]
     
-    # map_filepath = os.path.join(MAPS_FILES_DIRECTORY, f'map_{ts}.html')
-    # map_filepath = f'map_dashboard_files/folium_maps/map_{ts}.html'
+    
     map_url = url_for('static', filename=f'cache_maps/map_{ts}.html')
 
     
@@ -104,9 +104,16 @@ def render_index(connect_status : str, section : str):
         else:
             file_dict = {'Aucun fichier':''}
 
+        if user['profile_medium'].startswith(('http://', 'https://')):
+            photo_url = user['profile_medium']
+        else:
+            random_pic = random.choice(['alaf','remco','vanderpoel','ganna','mads','pogi','cav'])
+            photo_url = url_for('static', filename=f'images/pct/pct_{random_pic}.png')
+
 
     else:
         username = ''
+        photo_url = ''
         strava_connect_status = strava_connect_status0
         connect_btn = connect_btn0
         file_dict = {'Connexion requise':''}
@@ -118,10 +125,8 @@ def render_index(connect_status : str, section : str):
 
     
 
-
-    
     return render_template('index.html', title=section,
-                            status = connect_status, username = username, #---------> session en cours
+                            status = connect_status, username = username, photo_url = photo_url,#---------> session en cours
                             connect_btn = connect_btn, strava_connect_status=strava_connect_status, #------>status de la connexion
                             section1=section1,section2=section2,section3=section3,section4=section4, #------> section à activer
                             time = current_time, file_dict=file_dict #-----> section MAP
