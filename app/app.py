@@ -241,7 +241,7 @@ def strava_redirect():
         
         db.write_user(athlete_id=session['user_id'], new_token=new_dict, users_db_path=users_db_path)
     
-    return render_index(connect_status=status, section='gpxplorer')
+    return redirect(url_for('index', var = 'gpxplorer'), 301)
     
     
 #================ SECTION GPXPLORER ====================
@@ -259,7 +259,6 @@ def ma_route():
 @app.route('/load-dashboard', methods=['POST']) #lancement du dashboard
 def submit_form():
 
-    
     
     fileSource = request.form.get('fileSource')
 
