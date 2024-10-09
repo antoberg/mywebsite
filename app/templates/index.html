@@ -37,13 +37,14 @@
         </div>
         <div class="account">
         
-                <!-- Login -->
+            <!-- Login -->
             <div class="dropdown {{status}}" id="connect-drop">
                 <li><span class="nav-column"><a href="/strava-connect-btn" class="strava-connect-btn">Se connecter</a></span></li>
             </div>
             <!-- Menu mon compte -->
             <div class="dropdown {{status}}" id="account-drop">
-                <button class="dropbtn">
+                <button class="dropbtn account">
+                    <img src="https://dgalywyr863hv.cloudfront.net/pictures/athletes/7270139/2792894/38/medium.jpg">
                     <span class="nav-column {{section4}}"><a>{{username}}</a></span>
                     <i class="fa fa-caret-down"></i>
                 </button>
@@ -95,26 +96,21 @@
                                     <h3>Mes parcours</h3>
                                     
                                     <ul class="files-list">
-                                        {% for file in recent_files %}
-                                            <li><a href="#" class="file-link" data-filename="{{ file }}">{{ file }}</a></li>
+                                        {% for file_id, file_name in file_dict.items() %}
+                                            <li><a href="#" class="file-link" data-filename="{{ file_id }}">{{ file_name }}</a></li>
                                         {% endfor %}
                                     </ul>
                                     
                                 </div>
-                                <div class="files-list">
-                                    <h3>Evènements</h3>
-                                    <ul>
-                                        {% for file in race_files %}
-                                            <li><a href="#" class="file-link" data-filename="{{ file }}">{{ file }}</a></li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
+                                
                                 <div >
                                     <h3>Mes parcours Strava</h3>
-                                    <form action="/import-strava-routes" method="POST">
+                                    <form action="/import-strava-routes" method="POST" id="strava_load_form" class="{{status}}">
                                         <button type="submit" id="load-strava-routes">Charger</button>
+                                        
                                     </form>
                                     <i id="loading"></i>
+                                    <i id="load_strava_not_connected_status" class="{{status}}">Connexion requise</i>
                                     <ul class="files-list" id="strava-files-list">
                                         <!-- <li><a href="#" class="file-link" data-filename="test">test</a></li> -->
                                     </ul>
@@ -139,7 +135,7 @@
                             
                             <h2>Paramètres <i>(facultatif)</i></h2>
                             <hr>
-                            <form action="/submit" method="POST" enctype="multipart/form-data" id="paramsForm">
+                            <form action="/load-dashboard" method="POST" enctype="multipart/form-data" id="paramsForm">
                                 <div class="params-list">
                                     <li><label for="date"><h3>Date de départ</h3></label></li>
                                     <li> <input type="date" id="date" name="date"></li>

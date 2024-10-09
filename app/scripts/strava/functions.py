@@ -3,7 +3,7 @@ import requests
 import numpy as np
 import os
 
-STRAVA_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+
 
 #=================== GETTING ATHLETE INFOS ======================================
 
@@ -34,7 +34,7 @@ def get_athlete_routes(access_token: str, athlete_id: int):
     return namid
     
 def get_route_GPX(access_token: str, route_id: str, GPX_DIRECTORY : os.path):
-    filepath = os.path.join(GPX_DIRECTORY, f"route_{route_id}.gpx")
+    filepath = os.path.join(GPX_DIRECTORY, f"{route_id}.gpx")
     if not os.path.isfile(filepath): #on envoit la requête que si on a pas le fichier
         route_url = f"https://www.strava.com/api/v3/routes/{route_id}/export_gpx"
         response = requests.get(route_url, headers={'Authorization': f'Bearer {access_token}'})

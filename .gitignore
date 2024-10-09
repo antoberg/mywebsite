@@ -4,7 +4,7 @@
 *.log
 
 # Ignorer le dossier 'build'
-# app/files
+# app/data
 
 
 

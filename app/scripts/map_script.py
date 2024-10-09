@@ -13,7 +13,7 @@ def get_current_timestamp():
 
 # ================== MANIPULATION GPX =================
 
-def read_gpx(fichier_gpx):
+def read_gpx(fichier_gpx : os.path):
     with open(fichier_gpx, 'r',encoding='utf-8', errors='replace') as f: #Utf-8 important pour la lecture des emojis dans les titres strava
         gpx = gpxpy.parse(f)
 
@@ -91,7 +91,7 @@ def create_map(coords):
     lons = [c[1] for c in coords]
     center_lat = (max(lats)+min(lats))/2
     center_lon = (max(lons)+min(lons))/2
-    m = folium.Map(location=[center_lat,center_lon],zoom_start=11)
+    m = folium.Map(location=[center_lat,center_lon],zoom_start=10)
     Fullscreen(position='topright', title='Plein écran', titleCancel='Quitter plein écran').add_to(m)
     folium.Marker(coords[0],popup='start',icon=folium.Icon(icon='play',color='green')).add_to(m)
     folium.Marker(coords[len(coords)-1],popup='finish',icon=folium.Icon(icon='stop',color='red')).add_to(m)
@@ -195,12 +195,12 @@ def add_wind_vectors_to_map(df_weather, m):
 
 #==========================  COORDINATION DES FONCTIONS ===================================
 
-def make_map(filepath, date_str, speed, DIRECTORY : os.path):
-    coords, ele = read_gpx(filepath)
+def make_map(gpx_filepath  : os.path, date_str: str, speed : int, MAPS_FILES_DIRECTORY : os.path):
+    coords, ele = read_gpx(gpx_filepath)
     df_route= make_route_df(coords, ele)
     coords = df_route['coords']
     m = create_map(coords)
-    if date_str != 'nan':
+    if date_str:
         df_weather = get_weather(coords, date_str, speed)
         m = add_wind_vectors_to_map(df_weather, m)
 
@@ -212,7 +212,7 @@ def make_map(filepath, date_str, speed, DIRECTORY : os.path):
             'rain':[]
         })
     
-    return save_map(m, DIRECTORY), df_route, df_weather
+    return save_map(m, MAPS_FILES_DIRECTORY), df_route, df_weather
     
 # ========================== DEBUG ===============================================
 

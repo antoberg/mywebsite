@@ -158,6 +158,20 @@ body {
 {
     list-style-type: none;
 }
+.step .files-grid
+{
+    display: flex;
+    width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+}
+.step .files-grid div
+{
+    padding-right: 50px;
+
+}
 .files-grid a
 {
     font-size: 14px;
@@ -182,7 +196,14 @@ overflow-y: auto;
     color: var(--strava);
     
 }
-
+#strava_load_form.out
+{
+    display: none;
+}
+#load_strava_not_connected_status.in
+{
+    display: none;
+}
 
 .step li{
     /* list-style-type: none; */
@@ -230,24 +251,7 @@ overflow-y: auto;
     font-family: var(--main-font);
     font-size: 13px;
 }
-.step .files-grid
-{
 
-    display: flex;
-    width: 100%;
-    
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    
-    
-}
-.step .files-grid div
-{
-    padding-right: 50px;
-    
-    
-}
 
 .logo-container
 {
@@ -298,6 +302,7 @@ overflow-y: auto;
    width: 100%;
    display: flex;
    justify-content: right;
+
 }
 #connect-drop.in{
     display:none;
@@ -325,7 +330,16 @@ overflow-y: auto;
     background-color: inherit;
     font-family: inherit;
     margin: 0;
-    
+}
+.dropdown .dropbtn.account
+{
+    display: flex;
+    align-items: center;
+}
+
+.dropdown img
+{
+height: 45px;
 }
 
 

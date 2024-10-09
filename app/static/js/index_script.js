@@ -58,17 +58,21 @@ filelistContainers.forEach(file =>{
     
     if (event.target.classList.contains('file-link')) {
         // Empêche le lien d'ouvrir une nouvelle page
-        selectedFilename = event.target.getAttribute('data-filename');  // Stocke le nom du fichier
-        selectedId = event.target.id;  // Stocke l'ID du fichier (pour les routes strava)
+        selectedFilename = event.target.textContent;  // Stocke le nom du fichier
+          // Stocke l'ID du fichier (pour les routes strava)
         document.getElementById('filestatus').textContent = "Parcours sélectionné : "+selectedFilename.split('.')[0];  // Affiche le nom du fichier sélectionné
         document.getElementById('filestatuspic').src = checkIconUrl;
-
         document.getElementById('selectedFilename').value = selectedFilename;
+
         if (file.id  == "strava-files-list" ){
+            selectedId = event.target.id;
             document.getElementById('fileSource').value = "strava";
-            document.getElementById('fileId').value = selectedId;
+            document.getElementById('fileId').value = selectedId; //-> id route strava pour permettre le téléchargement du bon gpx dans flask
         }else{
+            selectedId = event.target.getAttribute('data-filename')
             document.getElementById('fileSource').value = "server";
+            document.getElementById('fileId').value = selectedId;
+            
         }
         }
     });
@@ -150,7 +154,7 @@ var connectButtons = document.getElementsByClassName("strava-connect-btn");
 // Boucle à travers chaque élément et ajoute l'event listener
 for (var i = 0; i < connectButtons.length; i++) {
     connectButtons[i].addEventListener("click", function(event) {
-        event.preventDefault(); // Empêche le changement de page par défaut
+        // event.preventDefault(); // Empêche le changement de page par défaut
         
     });
 }
