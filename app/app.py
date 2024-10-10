@@ -161,8 +161,9 @@ def clear_temp_files(TARGET_DIRECTORY):
 
 # ====================== ROUTES FLASK ===========================
 app = Flask(__name__)
-clear_temp_files(MAPS_FILES_DIRECTORY_TEMP)
-clear_temp_files(GPX_FILES_DIRECTORY_TEMP)
+#==> attention supprime les dossiers vides sur le server
+# clear_temp_files(MAPS_FILES_DIRECTORY_TEMP)
+# clear_temp_files(GPX_FILES_DIRECTORY_TEMP)
 #session Keys : 'user_id'
 
 def get_redirect_uri(debug_bool : bool):
