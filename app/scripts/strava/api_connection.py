@@ -35,7 +35,7 @@ def request_token(code: str) -> requests.Response:
                                    'grant_type': 'authorization_code'})
     return response
 
-def request_authorization(redirect_uri : str):
+def request_authorization(redirect_uri : str, approval_prompt : str): #auto ou force
     """
     Initiates the authorization process with Strava.
 
@@ -46,13 +46,13 @@ def request_authorization(redirect_uri : str):
     #----> important : approval_prompt : auto permet de se connecter sans demander les authorisations à chaque fois, sinon mettre force
     request_url = f'http://www.strava.com/oauth/authorize?client_id={client_id}' \
                     f'&response_type=code&redirect_uri={redirect_uri}' \
-                    f'&approval_prompt=auto' \
+                    f'&approval_prompt={approval_prompt}' \
                     f'&scope=profile:read_all,activity:read_all,read'
 
     # webbrowser.open(request_url)
     return request_url
  
-def refresh_token(refresh_token: str, athlete_id, users_db_path : os.path) -> requests.Response:
+def refresh_token(refresh_token: str) -> requests.Response:
     
     
 
@@ -73,12 +73,18 @@ def refresh_token(refresh_token: str, athlete_id, users_db_path : os.path) -> re
                                    'grant_type': 'refresh_token',
                                    'refresh_token': refresh_token})
     
-
     new_token = response.json()
-    new_token_dict = {'access_token' : new_token['access_token'],'expires_at':new_token['expires_at'],
-                      'refresh_token':new_token['refresh_token']}
     
-    return new_token
+    print(refresh_token)
+    print(new_token)
+
+    if 'access_token' in new_token:
+        new_token_dict = {'access_token' : new_token['access_token'],'expires_at':new_token['expires_at'],
+                        'refresh_token':new_token['refresh_token']}
+    else:
+        new_token_dict = False
+        
+    return new_token_dict
     
 
 

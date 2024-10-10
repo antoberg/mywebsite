@@ -165,6 +165,12 @@ clear_temp_files(MAPS_FILES_DIRECTORY_TEMP)
 clear_temp_files(GPX_FILES_DIRECTORY_TEMP)
 #session Keys : 'user_id'
 
+def get_redirect_uri(debug_bool : bool):
+    if debug_bool:
+        redirect_uri = 'http://127.0.0.1:5000/strava_redirect'
+    else:
+        redirect_uri = 'http://antoineberger.com/strava_redirect'
+    return redirect_uri
 
 
 @app.route('/')#redirect du nom de domaine
@@ -177,6 +183,7 @@ def index(var):
 intercepte les différentes requetes et renvoit aux sections 
 de l'index ou erreur 404 si section page inexistante
 '''
+
     # session.clear()
     if var in sections:
         print('========')
@@ -184,7 +191,7 @@ de l'index ou erreur 404 si section page inexistante
         print('========')
         if not 'user_id' in session:
             status = 'out'
-        
+
         else:
             status = 'in'
             
@@ -199,14 +206,23 @@ de l'index ou erreur 404 si section page inexistante
 @app.route('/strava-connect-btn')
 def strava_connect():
     if not 'user_id' in session:
-        if app.debug:
-            request_url = scon.request_authorization(redirect_uri = 'http://127.0.0.1:5000/strava_redirect')
-        else:
-            request_url = scon.request_authorization(redirect_uri = 'http://antoineberger.com/strava_redirect')
-   
-        return redirect(request_url)
+
+        return redirect(scon.request_authorization(get_redirect_uri(app.debug), 'auto'))
  
     else:
+        '''
+        FONCTION A AJOUTER (SEULEMENT SI CONNEXION INDEPENDANTE DE STRAVA POSSIBLE)
+        - si user_id mais pas connecté à strava alors on refresh le token au lieu de request authorization.
+        - créer une route différente pour la déconnexion
+        (pour l'instant ça fonctionne car chaque connexion requiere l'accès à strava)
+        '''
+        # if user['expires_at'] < time.time():
+            # refreshed_token = scon.refresh_token(refresh_token=user['refresh_token'])
+            # if refreshed_token: #si il y a pas d'erreur dans le refresh
+            #     db.write_user(user['athlete_id'], refreshed_token, users_db_path)
+            # else:
+            #     return redirect(scon.request_authorization(get_redirect_uri(app.debug), 'force'))
+
         session.pop('user_id')
         status = 'out'
         return render_index(connect_status=status, section='gpxplorer')
@@ -219,19 +235,19 @@ def strava_redirect():
     # Extraire le code de l'URL
     code = request.args.get('code')
     new_token = scon.request_token(code).json()
-    
+    print('new_token',new_token)
     user_id = new_token['athlete']['id'] #pour l'instant mes users id sont = athletes_id
+
     session['user_id'] = user_id
-
     user = read_user(user_id)
-
     #==== DEUX OPTIONS : user déja dans DB ou user inconnu
     if user:   
-    # OPTION 1 : user déja connu => REFRESH TOKEN SI BESOIN
+    # OPTION 1 : user déja connu => le new token est déja refresh 
+        new_token_dict = {'access_token' : new_token['access_token'],'expires_at':new_token['expires_at'],
+                        'refresh_token':new_token['refresh_token']}
+        db.write_user(user['athlete_id'], new_token_dict, users_db_path)
         
-        if user['expires_at'] < time.time():
-            refreshed_token = scon.refresh_token(refresh_token=user['refresh_token'],athlete_id=user['athlete_id'], users_db_path=users_db_path)
-            db.write_user(user['athlete_id'], refreshed_token, users_db_path)
+
     else:
     #OPTION 2 : user inconnu => AJOUT NEW USER DB
         new_dict = {'user_id':[user_id],

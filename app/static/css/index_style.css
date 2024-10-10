@@ -166,6 +166,10 @@ body {
     text-overflow: ellipsis;
     overflow: hidden;
 
+    
+    position: relative;
+    flex-wrap: wrap;
+
 }
 .step .files-grid div
 {

@@ -7,8 +7,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index_style.css') }}?v={{ time }}">
     
     <link rel="icon" href= "{{ url_for('static', filename='images/home_logo_bg.jpg') }}" type="image/jpg">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/home_logo_bg.jpg') }}">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
     <title>{{title}}</title>
 </head>
 
